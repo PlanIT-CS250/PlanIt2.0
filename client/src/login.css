@@ -1,0 +1,126 @@
+
+@import url('https://fonts.googleapis.com/css?family=Poppins:400,500,700&display=swap');
+
+
+   body {
+     margin: 0;
+     padding: 0;
+     font-family: 'Poppins', sans-serif;
+     background: linear-gradient(90deg, rgb(0, 0, 0) 0%, rgb(47, 29, 95) 51%, rgb(36, 23, 95) 100%);
+     background-size: cover;
+   }
+  
+   .login-container {
+     display: flex;
+     justify-content: center;
+     align-items: center;
+     height: 100vh;
+     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+     max-width: 400px;
+     margin: 0 auto;
+     padding: 20px;
+
+     /* Center container */
+     position: absolute;
+     top:  50%;
+     left: 50%;
+     transform: translate(-50%,-50%);
+   }
+  
+   form {
+     background-color: #fff;
+     border-radius: 25px;
+     border: none;
+     padding: 40px;
+     width: 400px;
+     box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+   }
+  
+   h2 {
+     color: #333;
+     font-weight: 500;
+     margin-bottom: 30px;
+   }
+
+   h3 {
+    font-size: small;
+    color: #333;
+    font-weight: 500;
+    margin-bottom: -15px;
+    margin-left: 85px;
+  }
+  
+   .input-group {
+     position: relative;
+     margin-bottom: 30px;
+     
+   }
+  
+   input {
+     width: 100%;
+     height: 50px;
+     border: none;
+     border-bottom: 2px solid #ccc;
+     font-size: 16px;
+     padding: 5px 0;
+     background-color: transparent;
+     outline: none;
+     color: black;
+   }
+  
+   label {
+     position: absolute;
+     top: 50%;
+     left: 0;
+     transform: translateY(-50%);
+     color: #999;
+     pointer-events: none;
+     transition: all 0.3s ease;
+   }
+  
+   input:focus ~ label,
+   input:valid ~ label {
+     top: 0;
+     transform: translateY(-100%);
+     font-size: 14px;
+     color: #333;
+   }
+  
+   button[type="submit"] {
+     display: block;
+     width: 100%;
+     height: 50px;
+     border: none;
+     background-color: black;
+     color: #fff;
+     font-size: 16px;
+     font-weight: 500;
+     text-transform: uppercase;
+     border-radius: 25px;
+     cursor: pointer;
+     transition: all 0.3s ease;
+   }
+  
+   button[type="submit"]:hover {
+     background-color: #3d1341;
+   }
+  
+   #togglePassword {
+     position: absolute;
+     top: 50%;
+     right: 0;
+     transform: translateY(-50%);
+     color: #999;
+     cursor: pointer;
+   }
+  
+   #togglePassword:hover {
+     color: #333;
+   }
+  
+   #password[type="password"] {
+     padding-right: 40px;
+   }   
+
+
+
