@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 function Login() 
 {
     const navigate = useNavigate();
-    const [username, setUsername] = useState('');
+    const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
@@ -15,7 +15,7 @@ function Login()
         e.preventDefault();
         try
         {
-            const res = await axios.post("http://localhost:3000/users/login", { email: username, password: password });
+            const res = await axios.post("http://localhost:3000/users/login", { email: email, password: password });
 
             //If token is recieved in response, authentication was successful
             if (res.data.token) {
@@ -43,12 +43,12 @@ function Login()
                 <div className="input-group">
                     <input
                         type="text"
-                        id="username"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
+                        id="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                         required
                     />
-                    <label htmlFor="username">Username</label>
+                    <label htmlFor="email">Email</label>
                 </div>
                 <div className="input-group">
                     <input
