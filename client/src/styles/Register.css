@@ -1,0 +1,88 @@
+/* client/src/styles/Register.css */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    background: url(../assets/planets.png);
+    background-size: cover;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+
+.register-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+}
+
+.register-form {
+    background-color: #fff;
+    border-radius: 25px;
+    padding: 40px;
+    width: 400px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.register-form h2 {
+    color: #333;
+    font-weight: 500;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.register-input-group {
+    position: relative;
+    margin-bottom: 30px;
+}
+
+.register-input-group input {
+    width: 100%;
+    height: 50px;
+    border: none;
+    border-bottom: 2px solid #ccc;
+    font-size: 16px;
+    padding: 5px 0;
+    background-color: transparent;
+    outline: none;
+}
+
+.register-input-group label {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    transform: translateY(-50%);
+    color: #999;
+    pointer-events: none;
+    transition: all 0.3s ease;
+}
+
+.register-input-group input:focus ~ label,
+.register-input-group input:valid ~ label {
+    top: 0;
+    transform: translateY(-100%);
+    font-size: 14px;
+    color: #333;
+}
+
+.register-button {
+    display: block;
+    width: 100%;
+    height: 50px;
+    border: none;
+    background-color: black;
+    color: #fff;
+    font-size: 16px;
+    font-weight: 500;
+    text-transform: uppercase;
+    border-radius: 25px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: #3d1341;
+}
