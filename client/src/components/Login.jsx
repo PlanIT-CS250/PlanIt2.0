@@ -1,14 +1,12 @@
-// eslint-disable-next-line no-unused-vars
 import React, { useState } from 'react';
-import '../styles/Login.css';
+import './login.css'; 
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import '@fortawesome/fontawesome-free/css/all.min.css';
 
 function Login() 
 {
     const navigate = useNavigate();
-    const [email, setEmail] = useState('');
+    const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [showPassword, setShowPassword] = useState(false);
 
@@ -17,8 +15,8 @@ function Login()
         e.preventDefault();
         try
         {
-            const res = await axios.post("http://localhost:3000/users/login", {
-                email: email, password: password });
+            const res = await axios.post("http://localhost:3000/users/login", { email: username, password: password });
+
             //If token is recieved in response, authentication was successful
             if (res.data.token) {
                 //Store token in local storage and navigate to home.jsx
@@ -45,12 +43,12 @@ function Login()
                 <div className="input-group">
                     <input
                         type="text"
-                        id="email"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
+                        id="username"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
                         required
                     />
-                    <label htmlFor="email">Email</label>
+                    <label htmlFor="username">Username</label>
                 </div>
                 <div className="input-group">
                     <input
@@ -70,7 +68,7 @@ function Login()
                 </div>
                 <button type="submit">Login</button>
                 <div>
-                    <a href="/register" className="registers-link">No account? Click here to register</a>
+                    <a href="/register" className="register-link">No account? Click here to register</a>
                 </div>
             </form>
         </div>

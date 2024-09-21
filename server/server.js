@@ -12,7 +12,6 @@ app.use(express.json());
 
 const mongoose = require("mongoose");
 
-
 //Import Schema
 const User = require('./schema/User');
 
