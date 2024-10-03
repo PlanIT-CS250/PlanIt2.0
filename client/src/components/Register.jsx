@@ -91,7 +91,7 @@ function Register() {
                     />
                     <label htmlFor="password">Password</label>
                 </div>
-                <button type="submit" className="register-button">Register</button>
+                <button type="submit" className="registers-button">Register</button>
             </form>
         </div>
     );
