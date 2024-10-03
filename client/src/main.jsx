@@ -6,6 +6,8 @@ import Home from './home.jsx';
 import './index.css';
 import Register from "./components/Register.jsx";
 import './styles/Register.css';
+import Hub from './components/Hub.jsx';
+import './styles/Hub.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -15,6 +17,7 @@ createRoot(document.getElementById('root')).render(
         <Route path="/home" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+            <Route path="/hub" element={<Hub />} />
       </Routes>
     </Router>
   </StrictMode>,

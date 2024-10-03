@@ -1,0 +1,157 @@
+/* Navbar remains untouched */
+.hub-nav-top {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    width: 100%;
+    background: transparent;
+    overflow: hidden;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 20px;
+    margin: 0;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.hub-nav-left, .hub-nav-right {
+    display: flex;
+    align-items: center;
+    padding-right: 50px;
+}
+
+.hub-nav-top a, .hub-nav-top button {
+    color: #ecf0f1;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: 500;
+    font-family: 'Roboto', sans-serif;
+    transition: background-color 0.3s, color 0.3s;
+    border-radius: 4px;
+    padding: 10px 15px;
+    cursor: pointer;
+    margin: 0 5px;
+}
+
+.hub-nav-top a:hover, .hub-nav-top button:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ecf0f1;
+}
+
+.hub-nav-top a.active {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.hub-container {
+    padding-top: 70px; /* Pushes content down to clear the fixed navbar */
+}
+
+.search-bar {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.search-bar input {
+    width: 50%;
+    padding: 8px 12px;
+    border-radius: 20px;
+    border: 1px solid #bdc3c7;
+    font-family: 'Roboto', sans-serif;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.search-bar input:focus {
+    border-color: #4b6cb7;
+    outline: none;
+}
+
+.profile-image {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap; /* Allows the cards to wrap to the next row */
+    gap: 20px; /* Space between cards */
+    padding: 20px;
+    margin-top: 70px; /* Ensures it clears the navbar */
+}
+
+.card, .add-card {
+    background-color: #1a1a1a;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    border-radius: 10px;
+    flex: 1 1 calc(33.33% - 20px); /* Cards take up 33% width and leave space for gaps */
+    max-width: 300px; /* Optional max width */
+    min-width: 250px; /* Optional minimum width */
+    text-align: center;
+    padding: 10px;
+    overflow: hidden; /* Ensures the card content stays inside */
+}
+
+.card:hover, .add-card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0, 0, 0, 0.3);
+}
+
+.card-content h4, .add-card h4 {
+    font-size: 20px;
+    color: #ecf0f1;
+    margin: 10px 0;
+}
+
+.card-content p, .add-card p {
+    font-size: 14px;
+    color: #bdc3c7;
+    margin: 10px 0;
+}
+
+.card-button {
+    background-color: #3498db;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.card-button:hover {
+    background-color: #2980b9;
+}
+
+.add-card {
+    background-color: #e74c3c;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.3s;
+    text-align: center;
+    padding: 20px;
+}
+
+.add-card:hover {
+    background-color: #c0392b;
+}
+
+.add-card h4 {
+    font-size: 48px;
+    margin: 0;
+}
+
+.add-card p {
+    font-size: 14px;
+    color: white;
+    margin: 0;
+}
+

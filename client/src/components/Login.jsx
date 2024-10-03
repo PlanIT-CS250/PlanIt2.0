@@ -69,7 +69,7 @@ function Login()
                 </div>
                 <button type="submit">Login</button>
                 <div>
-                    <a href="/register" className="register-link">No account? Click here to register</a>
+                    <a href="/hub" className="register-link">No account? Click here to register</a>
                 </div>
             </form>
         </div>
