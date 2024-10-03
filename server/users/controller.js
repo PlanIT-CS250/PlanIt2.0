@@ -2,14 +2,16 @@ const User = require('../schema/User');
 const secret = 'your_jwt_secret'; 
 const jwt = require('jsonwebtoken');
 
-async function validateLogin(req, res) {
+/*POST request at /users/login
+Compares email to password and determines if login is valid*/
+async function validateLogin(req, res) 
+{
     const { email, password } = req.body;
 
     try 
     {
         //Find user by email
         const user = await User.findOne({ email: email });
-        //If user is found
         if (user) 
         {
             //If password matches account
@@ -25,7 +27,7 @@ async function validateLogin(req, res) {
                 console.log(`Unsuccessful login for account ${email}`);
             }
         } 
-        // Email does not exist
+        //Email does not exist
         else {
             res.status(404).json({ message: "Email not found" });
             console.log(`Unsuccessful login for non-existing account ${email}`);
@@ -37,7 +39,44 @@ async function validateLogin(req, res) {
     }
 }
 
-async function getName(req, res) {
+/*POST request on /users/register
+Adds new user to database if provided information meets criteria*/
+async function registerUser(req, res)
+{
+    const { firstName, lastName, username, email, password } = req.body;
+
+    try {
+        const highestIdUser = await User.findOne({})
+            .sort({ _id: -1 })  //Sort by _id in descending order
+            .limit(1);          //Limit to 1 document
+
+        //Check if username or email already exists in database
+        existingEmail = await User.findOne({ email: email });
+        existingUsername = await User.findOne({ username: username });
+        if (existingEmail) {
+            return res.status(409).json({ message: `Email ${email} is taken.` });
+        } 
+        else if (existingUsername) {
+            return res.status(409).json({ message: `Username ${username} is taken.` });
+        }
+
+        const newUser = new User({ _id: highestIdUser._id + 1, fName: firstName, lName: lastName, 
+                                username: username, email: email, password: password});
+
+        await newUser.save();
+        const token = jwt.sign({ userId: newUser._id }, secret, { expiresIn: '15m' });
+        return res.status(201).json({ token: token, message: "User added successfully." })
+    } 
+    catch(error) {
+        res.status(400).json({ message: (error.message.split(": ")[2] + '.') });
+    }
+}
+
+
+/*GET request at /users/name
+Returns first name of user given user id*/
+async function getName(req, res) 
+{
     try {
       const user = await User.findOne({ _id: req.user.userId });
   
@@ -53,4 +92,5 @@ async function getName(req, res) {
 module.exports = {
     validateLogin,
     getName,
+    registerUser,
 }

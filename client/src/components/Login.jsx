@@ -25,7 +25,7 @@ function Login()
                 navigate("/home");
             }
             else {
-                alert("Token not found");
+                alert("Server error: Token not found. Try again later or contact support.");
             }
         }
         catch (error) {
