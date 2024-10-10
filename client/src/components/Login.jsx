@@ -22,7 +22,7 @@ function Login()
             if (res.data.token) {
                 //Store token in local storage and navigate to home.jsx
                 localStorage.setItem('token', res.data.token);
-                navigate("/home");
+                navigate("/hub");
             }
             else {
                 alert("Server error: Token not found. Try again later or contact support.");
@@ -69,7 +69,7 @@ function Login()
                 </div>
                 <button type="submit">Login</button>
                 <div>
-                    <a href="/hub" className="register-link">No account? Click here to register</a>
+                    <a href="/register" className="register-link">No account? Click here to register</a>
                 </div>
             </form>
         </div>

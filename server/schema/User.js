@@ -47,6 +47,8 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: true
   }
-}, { collection: "users" }); 
+}, { collection: "users" }); //Entries are added to 'users' collection
+
+const User = mongoose.model("users", userSchema);
  
-module.exports = mongoose.model("users", userSchema); //Entries are added to 'users' collection
+module.exports = {User, userSchema};

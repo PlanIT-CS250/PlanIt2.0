@@ -17,6 +17,7 @@ app.use(express.json());
 
 //Router for /users/...
 app.use('/users', require('./users/routes'));
+app.use('/planets', require('./planets/routes')); 
 
 const uri = 
   "mongodb+srv://admin:adminpassword@planit-db.80npa.mongodb.net/?retryWrites=true&w=majority&appName=planit-db";
@@ -35,7 +36,3 @@ function connect()
 
 connect();
 connection = mongoose.connection;
-
-//Import Schema
-const User = require('./schema/User');
-User.init();

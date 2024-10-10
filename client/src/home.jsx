@@ -17,12 +17,12 @@ function Home() {
 
             try 
             {
-                const response = await axios.get('http://localhost:3000/users/name', {
+                const response = await axios.get('http://localhost:3000/planets/1', {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-                setFirstName(response.data.firstName);
+                setFirstName(response.data.name);
             } 
             catch (error) {
                 console.error('Failed to fetch user info:', error);
