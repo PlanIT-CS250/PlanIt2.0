@@ -25,7 +25,7 @@ function Register() {
             if (res.data.token) {
                 //Store token in local storage and navigate to home.jsx
                 localStorage.setItem('token', res.data.token);
-                navigate("/home");
+                navigate("/hub");
             }
             else {
                 alert("Server error: Token not found. Try again later or contact support.");
