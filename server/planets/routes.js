@@ -9,4 +9,6 @@ router.get("/user/:id", authenticateJWT, controller.getPlanets);
 //Returns a planet given its id
 router.get("/:id", authenticateJWT, controller.getPlanet);
 
+router.post("/", authenticateJWT, controller.createPlanet);
+
 module.exports = router;

@@ -1,6 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const Planet = require('./schema/Planet');
+const User = require('./schema/User');
 
 const app = express();
 const PORT = 3000;

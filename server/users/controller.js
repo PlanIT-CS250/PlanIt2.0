@@ -1,4 +1,4 @@
-const { User } = require('../schema/User');
+const User = require('../schema/User');
 const secret = 'your_jwt_secret'; 
 const jwt = require('jsonwebtoken');
 
@@ -46,10 +46,6 @@ async function registerUser(req, res)
     const { firstName, lastName, username, email, password } = req.body;
 
     try {
-        const highestIdUser = await User.findOne({})
-            .sort({ _id: -1 })  //Sort by _id in descending order
-            .limit(1);          //Limit to 1 document
-
         //Check if username or email already exists in database
         existingEmail = await User.findOne({ email: email });
         existingUsername = await User.findOne({ username: username });
@@ -60,7 +56,7 @@ async function registerUser(req, res)
             return res.status(409).json({ message: `Username ${username} is taken.` });
         }
 
-        const newUser = new User({ _id: highestIdUser._id + 1, fName: firstName, lName: lastName, 
+        const newUser = new User({ fName: firstName, lName: lastName, 
                                 username: username, email: email, password: password});
 
         await newUser.save();
@@ -72,25 +68,34 @@ async function registerUser(req, res)
     }
 }
 
-
-/*GET request at /users/name
-Returns first name of user given user id*/
-async function getName(req, res) 
+/*GET request at /users/:id
+Returns information about user with given id*/
+async function getUser(req, res) 
 {
+    userId = req.params.id; // /users/___ <-
+
     try {
-      const user = await User.findOne({ _id: req.user.userId });
-  
-      if (!user) {
-        return res.status(404).json({ message: 'User not found.' });
-      }
-      res.json({ firstName: user.fName });
+        //Search for user with given id
+        const user = await User.findOne({ _id: req.params.id });
+        if (user) {
+            //If request comes from user whose information they are requesting
+            if (useId == req.user.userId)
+            {
+                return res.status(200).json({ message: `Successfully retrieved data of user with id ${userId}.`});
+            }
+            return res.status(403).json({ message: 
+                `Access denied. Token of requester does not match requested user id ${userId}.`});
+        }
+        //User with given id does not exist
+        return res.status(404).json({ message: `No user found with id ${userId}.` });
+
     } catch (error) {
-      res.status(500).json({ message: 'Server error.' });
+      res.status(500).json({ message: 'Server error. Contact support or try again later.' });
     }
 }
 
 module.exports = {
     validateLogin,
-    getName,
+    getUser,
     registerUser,
 }

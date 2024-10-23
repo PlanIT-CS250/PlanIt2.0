@@ -9,27 +9,23 @@ function Home() {
 
     useEffect(() => {
         async function fetchUserName() {
-            const token = localStorage.getItem('token');
-            if (!token) {
-                navigate('/'); //Redirect to home if no token in local storage (token expired)
-                return;
-            }
-
-            try 
+            try
             {
-                const response = await axios.get('http://localhost:3000/planets/1', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                setFirstName(response.data.name);
-            } 
+                const token = localStorage.getItem('token');
+                const res = await axios.get("http://localhost:3000/planets/6716b05e03ae2588c9b0a809", 
+                    { headers: {
+                    'Authorization': `Bearer ${token}`
+                }});
+
+                if (res.data.role)
+                {
+                    console.log(res.data.role);
+                }
+            }
             catch (error) {
-                console.error('Failed to fetch user info:', error);
-                navigate('/'); //Redirect to login on error
+                console.log(error);
             }
         };
-
         fetchUserName();
     }, [navigate]);
 

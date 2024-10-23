@@ -8,6 +8,6 @@ router.post('/login', controller.validateLogin);
 router.post('/register', controller.registerUser);
 
 //Protected routes
-router.get('/name', authenticateJWT, controller.getName);
+router.get('/:id', authenticateJWT, controller.getUser);
 
 module.exports = router;

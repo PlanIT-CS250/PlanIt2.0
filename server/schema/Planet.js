@@ -2,11 +2,6 @@ const mongoose = require('mongoose');
 const { userSchema } = require('./User');
  
 const planetSchema = new mongoose.Schema({
-  _id: {
-    type: Number,
-    min: 1,
-    required: true
-  },
   name: {
     type: String,
     required: true,
@@ -22,9 +17,6 @@ const planetSchema = new mongoose.Schema({
         validator: v => v.length > 1 && v.length < 100,
         message: "Description must be between 1 and 100 characters"
     }
-  },
-  collaborators: {
-    type: [userSchema],
   },
   createdAt: {
     type: Date,
