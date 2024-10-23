@@ -1,6 +1,7 @@
 const User = require('../schema/User');
 const secret = 'your_jwt_secret'; 
 const jwt = require('jsonwebtoken');
+const mongoose = require('mongoose');
 
 /*POST request at /users/login
 Compares email to password and determines if login is valid*/
@@ -72,16 +73,17 @@ async function registerUser(req, res)
 Returns information about user with given id*/
 async function getUser(req, res) 
 {
-    userId = req.params.id; // /users/___ <-
-
     try {
+        const userId = req.params.id; // /users/___ <-
+        
         //Search for user with given id
-        const user = await User.findOne({ _id: req.params.id });
+        const user = await User.findOne({ _id: userId });
         if (user) {
             //If request comes from user whose information they are requesting
-            if (useId == req.user.userId)
+            if (toString(userId) == toString(req.user.userId))
             {
-                return res.status(200).json({ message: `Successfully retrieved data of user with id ${userId}.`});
+                return res.status(200).json({ 
+                    message: `Successfully retrieved data of user with id ${userId}.`, user: user});
             }
             return res.status(403).json({ message: 
                 `Access denied. Token of requester does not match requested user id ${userId}.`});
@@ -90,7 +92,8 @@ async function getUser(req, res)
         return res.status(404).json({ message: `No user found with id ${userId}.` });
 
     } catch (error) {
-      res.status(500).json({ message: 'Server error. Contact support or try again later.' });
+        console.log(error.message);
+        res.status(500).json({ message: 'Server error. Contact support or try again later.' });
     }
 }
 

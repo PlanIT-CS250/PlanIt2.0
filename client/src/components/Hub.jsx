@@ -1,15 +1,87 @@
 // eslint-disable-next-line no-unused-vars
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom'; //To navigate to other pages in the app
 import { NavLink } from 'react-router-dom';
+import axios from 'axios'; //To make requests to the server
 import '../styles/Hub.css';
 import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import { FaCog } from 'react-icons/fa'; // Import the gear icon
+import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 
 function Hub() {
     const [cards, setCards] = useState([]);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [userId, setUserId] = useState();
+    const [user, setUser] = useState();
+    const [ownedPlanets, setOwnedPlanets] = useState();
+    const [collaboratedPlanets, setCollaboratedPlanets] = useState();
     const maxCards = 15; // Set the maximum number of cards
+    const navigate = useNavigate();
+
+    //Decode token to get userId
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            try {
+                const decoded = jwtDecode(token);
+                setUserId(decoded.userId);
+            } catch (error) {
+                alert("Unable to decode token. Try logging in again or contact support.");
+                console.log(error);
+                // navigate('/'); // Redirects to login. Uncomment when testing is finished
+            }
+        } else {
+            // navigate('/'); // Redirects to login. Uncomment when testing is finished
+        }
+    }, []);
+
+    //Fetch user data
+    useEffect(() => {
+        if (userId) {
+            const fetchUserData = async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const res = await axios.get(`http://localhost:3000/users/${userId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    setUser(res.data.user);
+                } catch (error) {
+                    console.log(error);
+                    // navigate('/'); // Redirect to login. Uncomment when testing is finished
+                }
+            };
+            fetchUserData();
+        }
+    }, [userId]); // useEffect hooks runs when userId changes
+
+    //Fetch all planets for user
+    useEffect(() => {
+        if (user)
+        {
+            const fetchPlanets = async () => {
+                try {
+                    const token = localStorage.getItem('token');
+                    const res = await axios.get(`http://localhost:3000/planets/user/${userId}`, {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    setOwnedPlanets(res.data.ownedPlanets);
+                    setCollaboratedPlanets(res.data.collaboratedPlanets);
+                } catch (error) {
+                    console.log(error);
+                    // navigate('/'); // Redirect to login. Uncomment when testing is finished
+                }
+            };
+            fetchPlanets();
+            
+        }
+    }, [user]); // useEffect hooks runs when user changes
+
+
 
     const addNewCard = () => {
         if (cards.length < maxCards) {
