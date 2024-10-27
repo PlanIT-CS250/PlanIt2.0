@@ -181,13 +181,13 @@
     text-align: center;
 }
 
-.card h4 {
+.card h4, .card-input-title {
     margin: 10px 0 5px;
     font-size: 18px;
     font-weight: bold;
 }
 
-.card p {
+.card p, .card-input-desc {
     margin: 5px 0;
     font-size: 14px;
 }
@@ -242,4 +242,38 @@
     margin: 5px 0 0;
     font-size: 14px;
 }
+
+.card-input-title {
+    font-size: 18px;     /* Same font size as h4 */
+    font-weight: bold;   /* Same font weight as h4 */
+    background: none;    /* No background */
+    color: white;        /* Text color */
+    outline: none;       /* Remove outline on focus */
+}
+
+.card-input-desc {
+    font-size: 14px;     /* Same font size as p */
+    background: none;    /* No background */
+    color: white;        /* Text color */
+    outline: none;       /* Remove outline on focus */
+}
+
+.card-input-title,
+.card-input-desc {
+    border: none;
+    margin-top: 10px;
+    text-align: center;
+    padding: 0; /* Remove padding */
+    outline: none; /* Remove outline on focus */
+    background: none; /* Make background transparent */
+    color: gray; /* Text color to match */
+    height: auto; /* Allow height to adjust */
+    box-sizing: content-box; /* Exclude padding and border from height calculation */
+}
+
+.card:has(input)
+{
+    border: 3px solid #3498db;
+}
+
 

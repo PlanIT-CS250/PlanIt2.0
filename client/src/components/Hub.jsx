@@ -2,100 +2,219 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom'; //To navigate to other pages in the app
 import { NavLink } from 'react-router-dom';
-import axios from 'axios'; //To make requests to the server
 import '../styles/Hub.css';
 import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import { FaCog } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
+import axios from 'axios';
 
 function Hub() {
     const [cards, setCards] = useState([]);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
+    const [token, setToken] = useState();
     const [userId, setUserId] = useState();
     const [user, setUser] = useState();
     const [ownedPlanets, setOwnedPlanets] = useState();
     const [collaboratedPlanets, setCollaboratedPlanets] = useState();
+    const [newCardTitle, setNewCardTitle] = useState("Enter Title");
+    const [newCardDesc, setNewCardDesc] = useState("Enter Description");
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
 
-    //Decode token to get userId
+    //Grab token from local storage
     useEffect(() => {
-        const token = localStorage.getItem('token');
-        if (token) {
-            try {
-                const decoded = jwtDecode(token);
-                setUserId(decoded.userId);
-            } catch (error) {
-                alert("Unable to decode token. Try logging in again or contact support.");
-                console.log(error);
-                // navigate('/'); // Redirects to login. Uncomment when testing is finished
+        try {
+            if (!localStorage.getItem('token'))
+            {
+                navigate('/'); //Redirect to login
             }
-        } else {
-            // navigate('/'); // Redirects to login. Uncomment when testing is finished
+            setToken(localStorage.getItem('token'));
+        }
+        catch {
+            navigate('/'); //Redirect to login
         }
     }, []);
 
+    //Decode user id from token
+    useEffect(() => {
+        if (token)
+        {
+            try {
+                var decoded = jwtDecode(token);
+                setUserId(decoded.userId);
+            } catch {
+                navigate('/'); //Navigate to login
+            }
+        }
+    }, [token]);
+
     //Fetch user data
     useEffect(() => {
-        if (userId) {
-            const fetchUserData = async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    const res = await axios.get(`http://localhost:3000/users/${userId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    setUser(res.data.user);
-                } catch (error) {
-                    console.log(error);
-                    // navigate('/'); // Redirect to login. Uncomment when testing is finished
-                }
-            };
+        const fetchUserData = async () => {
+            try {
+                const res = await axios.get(`http://localhost:3000/users/${userId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+        
+                setUser(res.data.user);
+            } catch (error) {
+                navigate('/'); //Redirect to login
+            }
+        };
+        if (userId)
+        {
             fetchUserData();
         }
     }, [userId]); // useEffect hooks runs when userId changes
 
     //Fetch all planets for user
     useEffect(() => {
+        const fetchUserPlanets = async () => {
+            try {
+                const res = await axios.get(`http://localhost:3000/users/${userId}/planets`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+        
+                setOwnedPlanets(res.data.ownedPlanets);
+                setCollaboratedPlanets(res.data.collaboratedPlanets);
+
+                //Add cards for each planet returned
+                res.data.ownedPlanets.forEach((planet) => {
+                    //If planet is not already in array of cards
+                    if (!cards.some(card => card.id == planet._id))
+                    {
+                        addCard(planet);
+                    }
+                });
+                res.data.collaboratedPlanets.forEach((planet) => {
+                    if (!cards.some(card => card.id == planet._id))
+                    {
+                        addCard(planet);
+                    }
+                });
+            } catch (error) {
+                //Axios error
+                if (typeof error.response.status != undefined)
+                {
+                    //Redirect to login on all error statuses except 404 (no planets found)
+                    if (error.response.status != 404)
+                    {
+                        navigate('/');
+                    }
+                }
+                //Non-axios error
+                else {
+                    navigate('/'); //Redirect to login
+                }
+            }
+        };
         if (user)
         {
-            const fetchPlanets = async () => {
-                try {
-                    const token = localStorage.getItem('token');
-                    const res = await axios.get(`http://localhost:3000/planets/user/${userId}`, {
-                        headers: {
-                            'Authorization': `Bearer ${token}`
-                        }
-                    });
-                    setOwnedPlanets(res.data.ownedPlanets);
-                    setCollaboratedPlanets(res.data.collaboratedPlanets);
-                } catch (error) {
-                    console.log(error);
-                    // navigate('/'); // Redirect to login. Uncomment when testing is finished
-                }
-            };
-            fetchPlanets();
-            
-        }
+            fetchUserPlanets();
+        }            
     }, [user]); // useEffect hooks runs when user changes
 
 
+    //Post new planet information to database
+    async function createPlanet()
+    {
+        if (newCardTitle == "Enter Title")
+        {
+            alert("You must enter a title before creating a new planet.");
+        }
+        else if (newCardDesc == "Enter Description")
+        {
+            alert("You must enter a description before creating a new planet.");
+        }
+        else if (newCardTitle.length > 20 || newCardTitle.length < 1)
+        {
+            alert("Title must be between 1 and 20 characters.");
+        }
+        else if (newCardDesc.length > 50 || newCardDesc.length < 1)
+        {
+            alert("Description must be between 1 and 50 characters");
+        }
+        else
+        {
+            try 
+            {
+                const res = await axios.post(`http://localhost:3000/planets`, 
+                    {
+                        name: newCardTitle,
+                        description: newCardDesc,
+                        ownerId: userId
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
+                const newPlanet = res.data.planet;
+                setCards(prevCards => prevCards.filter(card => card.id !== -1)); //Remove add planet card
+                addCard(newPlanet); //Add new planet to cards
 
-    const addNewCard = () => {
-        if (cards.length < maxCards) {
-            const newCard = {
-                id: cards.length + 1,
-                title: `Card ${cards.length + 1}`,
-                description: `This is card ${cards.length + 1}`,
+                //Reset values for future new card
+                setNewCardTitle("Enter Title");
+                setNewCardDesc("Enter Description");
+            }
+            catch (error) {
+                alert(error.response.data.message);
+            }
+        }
+    }
+
+    //Adds a card of given planet to list
+    const addCard = (planet) => {
+        if (cards.length < maxCards) { 
+            const newCard = { 
+                id: planet._id,
+                title: planet.name,
+                description: planet.description,
                 imageUrl: 'https://via.placeholder.com/150' // Placeholder image URL
             };
-            setCards([...cards, newCard]);
-        } else {
+            setCards(prevCards => [...prevCards, newCard]);
+        }
+        else {
             alert('Maximum number of cards reached');
         }
-    };
+    }; 
+    
+    //Creates a placeholder card for user to enter title and description of new planet
+    function addNewPlanetCard()
+    {
+        if (cards.length < maxCards && !cards.some(card => card.id == -1))
+        {
+            const placeholder = {
+                id: -1, //Temporary id
+                title: newCardTitle,
+                description: newCardDesc,
+                imageUrl: 'https://via.placeholder.com/150'
+            };
+
+            setCards(prevCards => [...prevCards, placeholder]);
+        } 
+    }
+
+    function handleDescChange(e)
+    {
+        if (e.target.value.length <= 50)
+        {
+            setNewCardDesc(e.target.value);
+        }
+    }
+    function handleTitleChange(e)
+    {
+        if (e.target.value.length <= 20)
+        {
+            setNewCardTitle(e.target.value);
+        }
+    }
 
     const toggleDropdown = () => {
         setDropdownOpen(!isDropdownOpen);
@@ -123,8 +242,8 @@ function Hub() {
                         {isDropdownOpen && (
                             <div className="profile-dropdown">
                                 <div className="profile-header">
-                                    <span className="profile-name">Benjamin Green</span>
-                                    <span className="profile-email">benjamin.green5@snhu.edu</span>
+                                    <span className="profile-name">{user.fName} {user.lName}</span>
+                                    <span className="profile-email">{user.email}</span>
                                 </div>
                                 <div className="profile-options">
                                     <NavLink to="/quickstart">Open Quickstart</NavLink>
@@ -141,22 +260,46 @@ function Hub() {
             </div>
 
             <div className="card-container">
-                {cards.map(card => (
-                    <div className="card" key={card.id}>
-                        <img src={card.imageUrl} alt={card.title} className="card-image" />
-                        <div className="card-content">
-                            <h4>{card.title}</h4>   
-                            <p>{card.description}</p>
-                            <button className="card-button">Visit</button>
+                    {cards.map(card => (
+                            <div className="card" key={card.id}>
+                                <img src={card.imageUrl} alt={card.title} className="card-image" />
+                                <div className="card-content">
+                                    {card.id != -1 ? (
+                                        <>
+                                            <h4>{card.title}</h4>   
+                                            <p>{card.description}</p>
+                                            <button className="card-button">Visit</button>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <input 
+                                                className="card-input-title"
+                                                type="text"
+                                                value={newCardTitle}
+                                                minLength={1}
+                                                maxLength={20}
+                                                onChange={(e) => handleTitleChange(e)}
+                                            /> 
+                                            <input
+                                                className="card-input-desc"
+                                                type="text"
+                                                value={newCardDesc}
+                                                minLength={1}
+                                                maxLength={50}
+                                                onChange={(e) => handleDescChange(e)}
+                                            />
+                                            <button className="card-button" onClick={createPlanet}>Create</button>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                    ))}
+                    {cards.length < maxCards && (
+                        <div className="card add-card" onClick={addNewPlanetCard}>
+                            <h4>+</h4>
+                            <p>Create Planet</p>
                         </div>
-                    </div>
-                ))}
-                {cards.length < maxCards && (
-                    <div className="card add-card" onClick={addNewCard}>
-                        <h4>+</h4>
-                        <p>Add New Card</p>
-                    </div>
-                )}
+                    )}
             </div>
         </div>
     );

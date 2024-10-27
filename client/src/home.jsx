@@ -17,10 +17,7 @@ function Home() {
                     'Authorization': `Bearer ${token}`
                 }});
 
-                if (res.data.role)
-                {
-                    console.log(res.data.role);
-                }
+                console.log(res.data);
             }
             catch (error) {
                 console.log(error);

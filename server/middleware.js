@@ -3,6 +3,19 @@
 const jwt = require('jsonwebtoken');
 const secret = 'your_jwt_secret'; 
 
+const authenticateRole = (roles = []) => {
+  return (req, res, next) => {
+    //Allow access if roles is empty or includes requesting user's role
+    if (roles.length && !roles.includes(req.user.role))
+    {
+      return res.status(403).json({
+        message: `Access denied. User with role ${req.user.role} does not have permission.`
+      });
+    }
+    next();
+  };  
+};
+
 function authenticateJWT(req, res, next) {
   const token = req.headers['authorization']?.split(' ')[1]; //Extract token from request headers
 
@@ -17,4 +30,7 @@ function authenticateJWT(req, res, next) {
   });
 }
 
-module.exports = authenticateJWT;
+module.exports = {
+  authenticateRole,
+  authenticateJWT
+};

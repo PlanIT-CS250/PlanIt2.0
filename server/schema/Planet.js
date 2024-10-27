@@ -6,16 +6,16 @@ const planetSchema = new mongoose.Schema({
     type: String,
     required: true,
     validate: {
-        validator: v => v.length > 1 && v.length < 10,
-        message: "Planet name must be between 1 and 10 characters"
+        validator: v => v.length > 1 && v.length < 20,
+        message: "Planet name must be between 1 and 20 characters"
     }
   },
   description: {
     type: String,
     required: true,
     validate: {
-        validator: v => v.length > 1 && v.length < 100,
-        message: "Description must be between 1 and 100 characters"
+        validator: v => v.length > 1 && v.length < 50,
+        message: "Description must be between 1 and 50 characters"
     }
   },
   createdAt: {

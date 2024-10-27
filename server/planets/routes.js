@@ -1,14 +1,12 @@
 const { Router } = require('express');
 const controller = require('./controller');
-const authenticateJWT = require('../middleware');
+const middleware = require('../middleware');
 const router = Router();
 
-//Returns all planets user with given id is a collaborator in
-router.get("/user/:id", authenticateJWT, controller.getPlanets);
-
 //Returns a planet given its id
-router.get("/:id", authenticateJWT, controller.getPlanet);
+router.get("/:id", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getPlanet);
 
-router.post("/", authenticateJWT, controller.createPlanet);
+//Creates a new planet given its name and description
+router.post("/", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.createPlanet);
 
 module.exports = router;
