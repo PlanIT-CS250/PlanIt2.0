@@ -12,7 +12,7 @@
     align-items: center;
     padding: 8px 20px;
     margin: 0;
-    overflow: visible; /* Allow dropdowns to show outside of this area */
+    overflow: visible;
 }
 
 .hub-nav-left, .hub-nav-right {
@@ -21,9 +21,9 @@
     padding-right: 50px;
 }
 .logo-image {
-    width: 80px; /* Increased width */
+    width: 80px;
     height: auto;
-    margin-right: 10px; /* Space between the logo and the text */
+    margin-right: 10px; 
 }
 
 .hub-nav-top a {
@@ -40,7 +40,7 @@
 }
 
 .hub-container {
-    padding-top: 70px; /* Pushes content down to clear the fixed navbar */
+    padding-top: 70px;
 }
 
 .hub-nav-right {
@@ -99,15 +99,15 @@
 
 .profile-dropdown {
     display: block;
-    position: fixed; /* Change to fixed positioning */
-    top: 90px; /* Adjust this based on navbar height */
-    right: 20px; /* Align with profile image */
+    position: fixed;
+    top: 90px; 
+    right: 20px; 
     background-color: #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     border-radius: 8px;
     padding: 10px;
     width: 200px;
-    z-index: 1002; /* Ensure it is above the navbar */
+    z-index: 1002; 
     color: #333;
 }
 
@@ -149,20 +149,20 @@
 .card-container {
     display: grid;
     grid-template-columns: repeat(5, 200px); /* 5 cards per row, each 200px wide */
-    gap: 20px; /* Space between cards */
-    justify-content: center; /* Center the grid */
+    gap: 20px;
+    justify-content: center; 
     padding: 20px;
 }
 
 .card {
-    width: 200px; /* Fixed width */
-    height: 225px; /* Increased height to accommodate image */
-    background-color: #333; /* Background color for the card */
+    width: 200px;
+    height: 225px;
+    background-color: #333;
     color: white;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start; /* Align content to the top */
+    justify-content: flex-start;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
     transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -170,8 +170,8 @@
 
 .card-image {
     width: 100%;
-    height: 100px; /* Fixed height for the image */
-    object-fit: cover; /* Ensure the image covers the area */
+    height: 100px; 
+    object-fit: cover;
     border-top-left-radius: 8px;
     border-top-right-radius: 8px;
 }
@@ -229,7 +229,7 @@
 }
 
 .add-card:hover {
-    transform: translateY(-5px); /* Lift effect on hover */
+    transform: translateY(-5px); 
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
 }
 
@@ -244,18 +244,18 @@
 }
 
 .card-input-title {
-    font-size: 18px;     /* Same font size as h4 */
-    font-weight: bold;   /* Same font weight as h4 */
-    background: none;    /* No background */
-    color: white;        /* Text color */
-    outline: none;       /* Remove outline on focus */
+    font-size: 18px;     
+    font-weight: bold;   
+    background: none;    
+    color: white;     
+    outline: none;     
 }
 
 .card-input-desc {
-    font-size: 14px;     /* Same font size as p */
-    background: none;    /* No background */
-    color: white;        /* Text color */
-    outline: none;       /* Remove outline on focus */
+    font-size: 14px;   
+    background: none;
+    color: white;     
+    outline: none;     
 }
 
 .card-input-title,
@@ -263,17 +263,16 @@
     border: none;
     margin-top: 10px;
     text-align: center;
-    padding: 0; /* Remove padding */
-    outline: none; /* Remove outline on focus */
-    background: none; /* Make background transparent */
-    color: gray; /* Text color to match */
-    height: auto; /* Allow height to adjust */
-    box-sizing: content-box; /* Exclude padding and border from height calculation */
-}
+    padding: 0; 
+    outline: none;
+    background: none; 
+    color: gray; 
+    height: auto; 
+    box-sizing: content-box; 
 
 .card:has(input)
 {
     border: 3px solid #3498db;
 }
 
-
+}

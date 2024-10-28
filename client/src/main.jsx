@@ -8,6 +8,8 @@ import Register from "./components/Register.jsx";
 import './styles/Register.css';
 import Hub from './components/Hub.jsx';
 import './styles/Hub.css';
+import Planets from './components/PlanIT.jsx';
+import './styles/PlanIT.css';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -18,6 +20,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
             <Route path="/hub" element={<Hub />} />
+            <Route path="/planit" element={<Planets />} />
       </Routes>
     </Router>
   </StrictMode>,
