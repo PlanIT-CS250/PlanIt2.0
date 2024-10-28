@@ -1,27 +1,33 @@
-  body {
-    margin: 0;
-    font-family: sans-serif;
-    background-color: #e6eef2;
+/* Apply background color for PlanIT page only */
+.planit-page {
+    background-color: transparent; /* Use your preferred color */
+    min-height: 100vh;
     display: flex;
     justify-content: center;
     align-items: center;
-    height: 100vh;
-}
+    padding: 20px;
+  }
   
-  .board {
+  /* Centered Board */
+  .planit-page .board {
     display: flex;
     gap: 20px;
     padding: 20px;
-    background-color: #e0e4e7;
+    background-color: #ffffff;
     border-radius: 12px;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
     overflow-x: auto;
+    max-width: 90vw;
+    width: 100%;
+    max-height: 80vh; /* Limit height for centered look */
+    align-items: flex-start; /* Align columns at the top within the board */
   }
   
-  .column {
+  /* Column styling within PlanIT page */
+  .planit-page .column {
     background: linear-gradient(135deg, #4e5a65, #3a444e);
     border-radius: 8px;
-    width: 260px;
+    width: 240px;
     color: white;
     display: flex;
     flex-direction: column;
@@ -29,7 +35,7 @@
     transition: transform 0.2s;
   }
   
-  h3 {
+  .planit-page .column h3 {
     margin: 0;
     padding: 8px;
     text-align: center;
@@ -40,7 +46,8 @@
     border-radius: 4px;
   }
   
-  .cards-container {
+  /* Card container styling */
+  .planit-page .cards-container {
     flex-grow: 1;
     overflow-y: auto;
     padding: 8px 0;
@@ -50,7 +57,8 @@
     align-items: center;
   }
   
-  .card {
+  /* Card styling */
+  .planit-page .card {
     background-color: #ffffff;
     border-radius: 6px;
     padding: 8px;
@@ -67,12 +75,13 @@
     max-width: 220px;
   }
   
-  .card:hover {
+  .planit-page .card:hover {
     background-color: #f1f3f5;
     transform: translateY(-2px);
   }
   
-  .add-card-button {
+  /* Add card button styling */
+  .planit-page .add-card-button {
     background-color: #3a444e;
     border: none;
     color: #ffffffdd;
@@ -87,12 +96,13 @@
     margin-top: auto;
   }
   
-  .add-card-button:hover {
+  .planit-page .add-card-button:hover {
     background-color: #4e5a65;
     transform: scale(1.05);
   }
-
-  .hub-nav-top {
+  
+  
+.hub-nav-top {
     position: fixed;
     top: 0;
     left: 0;
