@@ -40,7 +40,7 @@ function Login()
     return (
         <div className="login-container">
             <form  onSubmit={handleLogin}>
-                <h2>PlanIT Login</h2>
+                <h2>PlanIt Login</h2>
                 <div className="input-group">
                     <input
                         type="text"

@@ -6,14 +6,16 @@ import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import '../styles/PlanIT.css';
 
+// Initial columns for the board
 const initialColumns = {
-  backlog: [{ id: '1', content: 'Something | Error Code' }],
-  inprogress: [{ id: '2', content: 'Something2' }],
+  backlog: [],
+  inprogress: [],
   todo: [],
   completed: [],
 };
 
 function PlanIT() {
+  // State for the columns on the board
   const [columns, setColumns] = useState(initialColumns);
   const [isDropdownOpen, setDropdownOpen] = useState(false);
 
@@ -27,6 +29,7 @@ function PlanIT() {
     );
     const destinationColumn = over.id;
 
+    // Move the card to the new column
     if (sourceColumn !== destinationColumn) {
       const sourceItems = Array.from(columns[sourceColumn]);
       const destinationItems = Array.from(columns[destinationColumn]);
@@ -45,6 +48,7 @@ function PlanIT() {
     }
   };
 
+  // Add a new card to the specified column
   const addCard = (columnId) => {
     const newCardContent = prompt("Enter new card content:");
     if (newCardContent) {
@@ -56,9 +60,17 @@ function PlanIT() {
         ...columns,
         [columnId]: [...columns[columnId], newCard],
       });
+      if (newCardContent.length > 25) {
+        alert('Card content is too long. Please keep it under 25 characters.');
+        setColumns({
+          ...columns,
+          [columnId]: columns[columnId].filter((card) => card.id !== newCard.id),
+        });
+      }
     }
   };
 
+  // Edit the content of a card
   const editCard = (columnId, cardId) => {
     const updatedContent = prompt("Edit card content:");
     if (updatedContent) {
@@ -71,6 +83,7 @@ function PlanIT() {
     }
   };
 
+  // The PlanIT page
   return (
     <div className="planit-page">
       {/* Navbar */}
@@ -129,6 +142,7 @@ function PlanIT() {
   );
 }
 
+// Column component
 function Column({ id, items, addCard, editCard }) {
   const { setNodeRef } = useDroppable({ id });
 
@@ -150,8 +164,10 @@ function Column({ id, items, addCard, editCard }) {
       </button>
     </div>
   );
+
 }
 
+// Draggable card component
 function DraggableCard({ id, content, onDoubleClick }) {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
   const style = {
