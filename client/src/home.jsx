@@ -12,11 +12,16 @@ function Home() {
             try
             {
                 const token = localStorage.getItem('token');
-                const res = await axios.get("http://localhost:3000/planets/6716b05e03ae2588c9b0a809", 
-                    { headers: {
-                    'Authorization': `Bearer ${token}`
-                }});
-
+                const res = await axios.post(`http://localhost:3000/planets/671e489598964232f2b32b09/columns`, 
+                    {
+                        name: "my new column"
+                    },
+                    {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    }
+                );
                 console.log(res.data);
             }
             catch (error) {

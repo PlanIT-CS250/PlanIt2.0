@@ -268,7 +268,7 @@ function Hub() {
                                         <>
                                             <h4>{card.title}</h4>   
                                             <p>{card.description}</p>
-                                            <button className="card-button">Visit</button>
+                                            <button className="card-button"><a href={`/planets/${card.id}`}>Visit</a></button>
                                         </>
                                     ) : (
                                         <>

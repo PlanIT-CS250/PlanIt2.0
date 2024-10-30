@@ -205,6 +205,10 @@
     transition: background-color 0.3s ease;
 }
 
+.card-button a {
+    color: white;
+}
+
 .card-button:hover {
     background-color: #2980b9;
 }
