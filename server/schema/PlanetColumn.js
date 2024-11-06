@@ -1,9 +1,8 @@
 const mongoose = require('mongoose');
  
-//Schema matches a collaborator or owner userId to a planetId
 const planetColumnSchema = new mongoose.Schema({
     planetId: {
-        type: mongoose.Schema.Types.ObjectId, //Object id of planet
+        type: mongoose.Schema.Types.ObjectId, //Object id of planet that column belongs to
         required: true
     },
     name: {

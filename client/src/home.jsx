@@ -8,28 +8,32 @@ function Home() {
     const navigate = useNavigate();
 
     useEffect(() => {
+        let res = null;
         async function fetchUserName() {
             try
             {
                 const token = localStorage.getItem('token');
-                const res = await axios.post(`http://localhost:3000/planets/671e489598964232f2b32b09/columns`, 
-                    {
-                        name: "my new column"
-                    },
+                res = await axios.delete(`http://localhost:3000/planets/columns/672b7a615d108cae51b6fb5a`, 
                     {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     }
                 );
-                console.log(res.data);
+                console.log(res.data.message);
+                alert(res.data.message);
             }
             catch (error) {
-                console.log(error);
+                console.log(error.response.data.message);
+                alert(error.response.data.message); 
             }
         };
         fetchUserName();
-    }, [navigate]);
+        if (res?.data?.message)
+        {
+            alert(res.data.message);
+        }
+    }, []);
 
     return (
         <div>

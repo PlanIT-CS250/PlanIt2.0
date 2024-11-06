@@ -1,6 +1,7 @@
 //Contains middleware to authenticate JWT and allow user to access protected routes
 
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const secret = 'your_jwt_secret'; 
 
 const authenticateRole = (roles = []) => {
@@ -30,7 +31,20 @@ function authenticateJWT(req, res, next) {
   });
 }
 
+//Limit 1 request per 30ms
+const limiter = rateLimit({
+  windowMs: 300, // 30ms
+  max: 1, // limit each IP to 1 request per windowMs
+  handler: (req, res) => {
+    console.log("Request blocked by rate limiter");
+    return res.status(429).json({
+        message: "Too many requests, please try again later."
+    });
+  }
+});
+
 module.exports = {
   authenticateRole,
-  authenticateJWT
+  authenticateJWT,
+  limiter
 };

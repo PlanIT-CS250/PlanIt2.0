@@ -30,4 +30,4 @@ const planetSchema = new mongoose.Schema({
   
 }, { collection: "planets" }); 
  
-module.exports = mongoose.model("planets", planetSchema); //Entries are added to 'planets' collection
+module.exports = mongoose.model("Planet", planetSchema); //Entries are added to 'planets' collection

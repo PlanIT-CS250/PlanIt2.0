@@ -52,16 +52,45 @@ function Hub() {
     //Fetch user data
     useEffect(() => {
         const fetchUserData = async () => {
+            let res = null;
             try {
-                const res = await axios.get(`http://localhost:3000/users/${userId}`, {
+                res = await axios.get(`http://localhost:3000/users/${userId}`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-        
+            } catch (error) 
+            {
+                //Response and status code were returned from server
+                if (error.response?.status) 
+                {
+                    alert(error.response.data.message);
+                    console.error(error.response);
+                    navigate('/');
+                }
+                //Request succeeded but received no response
+                else if (!error.response && error.request)
+                {
+                    alert("There was an error retrieving user data. Contact support or try again later.");
+                    console.error(error.response);
+                    navigate('/');
+                }
+                //Client-side error in setting up the request
+                else 
+                {
+                    alert("Client error. Contact support or try again later.");
+                    console.error(error.message);
+                    navigate('/');
+                }
+            }
+            
+            if (res?.data?.user)
+            {
                 setUser(res.data.user);
-            } catch (error) {
-                navigate('/'); //Redirect to login
+            }
+            else {
+                alert("There was an error retreiving user data. Contact support or try again later.");
+                navigate('/');
             }
         };
         if (userId)
@@ -73,13 +102,40 @@ function Hub() {
     //Fetch all planets for user
     useEffect(() => {
         const fetchUserPlanets = async () => {
+            let res = null;
             try {
-                const res = await axios.get(`http://localhost:3000/users/${userId}/planets`, {
+                res = await axios.get(`http://localhost:3000/users/${userId}/planets`, {
                     headers: {
                         'Authorization': `Bearer ${token}`
                     }
                 });
-        
+            } catch (error) 
+            {
+                //Response and status code were returned from server
+                if (error.response) 
+                {
+                    alert(error.response.data.message);
+                    console.error(error.response);
+                    navigate('/');
+                }
+                //Request succeeded but received no response
+                else if (error.request)
+                {
+                    alert("There was an error retrieving user's planets. Contact support or try again later.");
+                    console.error(error.response);
+                    navigate('/');
+                }
+                //Client-side error in setting up the request
+                else 
+                {
+                    alert("Client error in retrieving user's planets. Contact support or try again later.");
+                    console.error(error.message);
+                    navigate('/');
+                }
+            }
+            
+            if (res?.data?.ownedPlanets && res?.data?.collaboratedPlanets)
+            {
                 setOwnedPlanets(res.data.ownedPlanets);
                 setCollaboratedPlanets(res.data.collaboratedPlanets);
 
@@ -97,20 +153,10 @@ function Hub() {
                         addCard(planet);
                     }
                 });
-            } catch (error) {
-                //Axios error
-                if (typeof error.response.status != undefined)
-                {
-                    //Redirect to login on all error statuses except 404 (no planets found)
-                    if (error.response.status != 404)
-                    {
-                        navigate('/');
-                    }
-                }
-                //Non-axios error
-                else {
-                    navigate('/'); //Redirect to login
-                }
+            }
+            else {
+                alert("There was an error retrieving user's planets. Contact support or try again later.");
+                navigate('/');
             }
         };
         if (user)
@@ -141,9 +187,10 @@ function Hub() {
         }
         else
         {
+            let res = null;
             try 
             {
-                const res = await axios.post(`http://localhost:3000/planets`, 
+                res = await axios.post(`http://localhost:3000/planets`, 
                     {
                         name: newCardTitle,
                         description: newCardDesc,
@@ -155,17 +202,41 @@ function Hub() {
                         }
                     }
                 );
-                const newPlanet = res.data.planet;
-                setCards(prevCards => prevCards.filter(card => card.id !== -1)); //Remove add planet card
-                addCard(newPlanet); //Add new planet to cards
+            }
+            catch (error) 
+            {
+                //Response and status code were returned from server
+                if (error.response) 
+                { 
+                    //429 is returned when duplicate requests are quickly submitted, this can be ignored
+                    if (error.response.status != 429)
+                    {
+                        alert(error.response.data.message);
+                        console.error(error.response);
+                    }
+                }
+                //Request succeeded but received no response
+                else if (error.request)
+                {
+                    alert("There was an error creating a new planet. Contact support or try again later.");
+                    console.error(error.response);
+                }
+                //Client-side error in setting up the request
+                else 
+                {
+                    alert("Client error in creating planet. Contact support or try again later.");
+                    console.error(error.message);
+                }
+            }
 
-                //Reset values for future new card
-                setNewCardTitle("Enter Title");
-                setNewCardDesc("Enter Description");
-            }
-            catch (error) {
-                alert(error.response.data.message);
-            }
+            if (res?.data?.planet)
+            {
+                addCard(res.data.planet); //Add new planet to cards
+            }  
+            setCards(prevCards => prevCards.filter(card => card.id !== -1)); //Remove add planet card
+            //Reset values for future new card
+            setNewCardTitle("Enter Title");
+            setNewCardDesc("Enter Description");
         }
     }
 

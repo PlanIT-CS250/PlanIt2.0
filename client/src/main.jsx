@@ -12,7 +12,7 @@ import Planets from './components/PlanIT.jsx';
 import './styles/PlanIT.css';
 
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
+  //<StrictMode>
     <Router>
       <Routes>
         <Route path="/" element={<Login />} />
@@ -23,5 +23,5 @@ createRoot(document.getElementById('root')).render(
             <Route path="/planets/:id" element={<Planets />} />
       </Routes>
     </Router>
-  </StrictMode>,
+  //</StrictMode>,
 )

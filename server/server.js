@@ -17,8 +17,11 @@ app.listen(PORT, () => {
 
 app.use(express.json());
 
+//Router for /auth/...
+app.use('/auth', require('./auth/routes'));
 //Router for /users/...
 app.use('/users', require('./users/routes'));
+//Router for /planets/...
 app.use('/planets', require('./planets/routes')); 
 
 const uri = 

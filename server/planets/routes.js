@@ -3,19 +3,32 @@ const controller = require('./controller');
 const middleware = require('../middleware');
 const router = Router();
 
+//----------GET REQUESTS----------
 //Returns a planet given its id
-router.get("/:id", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getPlanet);
+router.get("/:planetId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getPlanet);
 //Returns all columns and their tasks of a planet given its id
-router.get("/:id/columns", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getColumns);
+router.get("/:planetId/columns", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getColumns);
 
-//Creates a new planet given its name and description
-router.post("/", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.createPlanet);
-//Creates a new task given its columnid and content
-router.post("/columns/:id/task", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.createTask);
+//----------POST REQUESTS----------
+//Creates a new planet given its name and description (in body)
+router.post("/", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.createPlanet);
+//Creates a new task given its columnid and content (in body)
+router.post("/columns/:columnId/task", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.createTask);
 //Creates a new column given its name and planet id
-router.post("/:id/columns", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.createColumn);
+router.post("/:planetId/columns", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.createColumn);
+//Creates a new planet invite to a user given user email (in body)
+router.post("/:planetId/invite", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.sendInvite);
 
+//----------PUT REQUESTS----------
 //Updates a task given its updated fields
-router.put("/tasks/:id", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.updateTask);
+router.put("/tasks/:taskId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.updateTask);
+
+//----------DELETE REQUESTS----------
+//Deletes a planet given its id
+router.delete("/:planetId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.deletePlanet);
+//Deletes a column given its id
+router.delete("/columns/:columnId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.deleteColumn);
+//Deletes a task given its id
+router.delete("/tasks/:taskId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.deleteTask);
 
 module.exports = router;
