@@ -10,8 +10,6 @@ import Hub from './components/Hub.jsx';
 import './styles/Hub.css';
 import Planets from './components/PlanIT.jsx';
 import './styles/PlanIT.css';
-import App from './components/popup-components/App.jsx'
-import './index.css'
 
 createRoot(document.getElementById('root')).render(
   //<StrictMode>

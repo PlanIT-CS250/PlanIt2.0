@@ -9,12 +9,9 @@ import { FaCog } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 import axios from 'axios';
 
-// Popup imports
-
 function Hub() {
     const [cards, setCards] = useState([]);
     const [isDropdownOpen, setDropdownOpen] = useState(false);
-    const [isModalOpen, setModalOpen] = useState(false);
     const [token, setToken] = useState();
     const [userId, setUserId] = useState();
     const [user, setUser] = useState();
@@ -24,7 +21,6 @@ function Hub() {
     const [newCardDesc, setNewCardDesc] = useState("Enter Description");
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
-    
 
     //Grab token from local storage
     useEffect(() => {
@@ -370,7 +366,7 @@ function Hub() {
                             </div>
                     ))}
                     {cards.length < maxCards && (
-                        <div className="card add-card" onClick={createPlanet}>
+                        <div className="card add-card" onClick={addNewPlanetCard}>
                             <h4>+</h4>
                             <p>Create Planet</p>
                         </div>
