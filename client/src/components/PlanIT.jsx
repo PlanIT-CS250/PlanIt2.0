@@ -21,6 +21,7 @@ function PlanIT() {
   const [planetCollaborators, setPlanetCollaborators] = useState();
   const [tables, setTables] = useState([]);
   const { id } = useParams(); //Id passed in url parameters
+  
   const planetId = id;
   const navigate = useNavigate();
 
@@ -311,8 +312,8 @@ const handleDragEnd = (event) => {
             {isDropdownOpen && (
               <div className="profile-dropdown">
                 <div className="profile-header">
-                  <span className="profile-name">Benjamin Green</span>
-                  <span className="profile-email">benjamin.green5@snhu.edu</span>
+                  <span className="profile-name">{user.fName} {user.lName}</span>
+                  <span className="profile-email">{user.email}</span>
                 </div>
                 <div className="profile-options">
                   <NavLink to="/quickstart">Open Quickstart</NavLink>
