@@ -10,6 +10,9 @@ import Hub from './components/Hub.jsx';
 import './styles/Hub.css';
 import Planets from './components/PlanIT.jsx';
 import './styles/PlanIT.css';
+import PlanetSettings from './components/PlanetSettings.jsx';
+import './styles/PlanetSettings.css';
+
 
 createRoot(document.getElementById('root')).render(
   //<StrictMode>

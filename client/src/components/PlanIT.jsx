@@ -9,6 +9,7 @@ import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import '../styles/PlanIT.css';
 import axios from 'axios';
+import Modal from './Modal.jsx';
 
 function PlanIT() {
   // State for the columns on the board
@@ -303,7 +304,7 @@ const handleDragEnd = (event) => {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="hub-nav-right">
-          <NavLink to="/settings" className="settings">
+          <NavLink to="/planetsettings" className="settings">
             <FaCog className="settings-icon" />
           </NavLink>
           <div className="profile" onClick={() => setDropdownOpen(!isDropdownOpen)}>

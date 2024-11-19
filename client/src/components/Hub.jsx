@@ -8,9 +8,14 @@ import logoImage from '../assets/logo.png';
 import { FaCog } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 import axios from 'axios';
+import ThemeDrop from './Dropdown';
+import ColorWheel from './ColorPicker';
+import '../styles/Dropdown.css';
+import '../styles/ColorPicker.css';
 
 function Hub() {
     const [cards, setCards] = useState([]);
+    const [openModal, setOpenModal] = useState(false)
     const [isDropdownOpen, setDropdownOpen] = useState(false);
     const [token, setToken] = useState();
     const [userId, setUserId] = useState();
@@ -291,6 +296,40 @@ function Hub() {
         setDropdownOpen(!isDropdownOpen);
     };
 
+    const handleCreatePlanetAndClose = () => {
+        createPlanet();
+        onClose();
+    };
+
+    const Modal = ({open,onClose, createPlanet}) => {
+        if(!open) return null
+        return(
+            <div onClick={onClose} className='backblur'>
+                <div onClick={(e) => {
+                    e.stopPropagation()
+                }}className='modalContainer'>
+                    <div className="modalRight">
+                        <p onClick={onClose} className="closeBtn">X</p>
+                        <div className="content">
+                            <ThemeDrop/>
+                            <ColorWheel/>
+                            
+                        </div>
+                        <div className="btnContainer">
+                            <button className='btnPrimary' onClick={handleCreatePlanetAndClose}>
+                                <span className='bold'>YES PLEASE</span> 
+                            </button>
+                            <button onClick={onClose} className='btnOutline'>
+                                <span  className='bold'>NO THANKS</span> 
+                            </button>
+                        </div>
+                    </div>
+                </div>
+    
+            </div>
+        )
+    }
+
     return (
         <div className="hub-container">
             <div className="hub-nav-top">
@@ -359,7 +398,9 @@ function Hub() {
                                                 maxLength={50}
                                                 onChange={(e) => handleDescChange(e)}
                                             />
-                                            <button className="card-button" onClick={createPlanet}>Create</button>
+                                            <button className="card-button" onClick={() => setOpenModal(true)}>Create</button>
+                                            <Modal open={openModal}onClose={()=> setOpenModal(false)}/>
+                                                
                                         </>
                                     )}
                                 </div>
