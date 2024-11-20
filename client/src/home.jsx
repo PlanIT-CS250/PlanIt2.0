@@ -13,8 +13,8 @@ function Home() {
             try
             {
                 const token = localStorage.getItem('token');
-                res = await axios.delete(`http://localhost:3000/planets/columns/672b7a615d108cae51b6fb5a`, 
-                    {
+                res = await axios.put(`http://localhost:3000/planets/672b8146aae5762689d10ddd/users/671e483498964232f2b32aed/promote`, 
+                   {}, {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }

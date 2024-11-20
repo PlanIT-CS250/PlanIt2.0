@@ -166,8 +166,221 @@ async function getInvites(req, res)
     }
 }
 
+//POST request for /users/invites/:inviteId/accept
+async function acceptInvite(req, res)
+{
+    try
+    {
+        const { inviteId } = req.params;
+
+        //Find invite
+        const invite = await PlanetInvite.findById(inviteId);
+        if (invite)
+        {
+            //If id of token is the invited user
+            if (invite.invitedUserId == req.user.userId || req.user.role == "admin")
+            {
+                //Find planet
+                const planet = await Planet.findById(invite.planetId);
+                if (planet)
+                {
+                    const user = await User.findById(invite.invitedUserId);
+                    if (user)
+                    {
+                        const newPlanetCollaborator = new PlanetCollaborator({
+                            planetId: invite.planetId,
+                            userId: invite.invitedUserId,
+                            role: "collaborator"
+                        });
+                        try {
+                            await newPlanetCollaborator.save();
+                        } catch (error) 
+                        {
+                            console.error(error.message);
+                            await PlanetCollaborator.deleteOne({ _id: newPlanetCollaborator._id }); //Delete any unintentionally saved documents
+    
+                            return res.status(500).json({ 
+                                message: "Internal server error. Contact support or try again later." 
+                            });
+                        }
+    
+                        //New collaborator saved without fail
+                        await PlanetInvite.deleteOne({ _id: invite._id });
+                        return res.status(200).json({
+                            message: "Invited accepted successfully."
+                        });
+                    }
+                    //User not found
+                    const orphanedInvites = await PlanetInvite.find({ invitedUserId: invite.invitedUserId }).select('_id');
+                    console.log("Orphaned data of type planet_invite found: " + orphanedInvites);
+                    return res.status(404).json({
+                        message: "User has been deleted."
+                    });
+                }
+                //Planet not found
+                const orphanedInvites = await PlanetInvite.find({ planetId: invite.planetId }).select('_id');
+                console.log("Orphaned data of type planet_invite found: " + orphanedInvites);
+                return res.status(404).json({
+                    message: "Planet has been deleted."
+                });
+            }
+            //Id of token is not invited user
+            return res.status(403).json({
+                message: "You do not have permission to accept this invite."
+            });
+        }
+        //Invite not found
+        return res.status(404).json({
+            message: "Cannot accept non-existent invite."
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ 
+            message: "Server error. Contact support or try again later." 
+        }); 
+    }
+}
+
+//POST reqeuest on /users/invites/:inviteId/decline
+//Deletes an invite given its id
+async function declineInvite(req, res)
+{
+    try
+    {
+        const { inviteId } = req.params;
+
+        //Find invite
+        const invite = await PlanetInvite.findById(inviteId);
+        if (invite)
+        {
+            //If id of token is the invited user
+            if (invite.invitedUserId == req.user.userId || req.user.role == "admin")
+            {
+                //Find planet
+                const planet = await Planet.findById(invite.planetId);
+                if (planet)
+                {
+                    const user = await User.findById(invite.invitedUserId);
+                    if (user)
+                    {
+                        //Delete (decline) invite
+                        await PlanetInvite.deleteOne({ _id: invite._id });
+                        return res.status(200).json({
+                            message: "Invited declined successfully."
+                        });
+                    }
+                    //User not found
+                    const orphanedInvites = await PlanetInvite.find({ invitedUserId: invite.invitedUserId }).select('_id');
+                    console.log("Orphaned data of type planet_invite found: " + orphanedInvites);
+                    return res.status(404).json({
+                        message: "User has been deleted."
+                    });
+                }
+                //Planet not found
+                const orphanedInvites = await PlanetInvite.find({ planetId: invite.planetId }).select('_id');
+                console.log("Orphaned data of type planet_invite found: " + orphanedInvites);
+                return res.status(404).json({
+                    message: "Planet has been deleted."
+                });
+            }
+            //Id of token is not invited user
+            return res.status(403).json({
+                message: "You do not have permission to accept this invite."
+            });
+        }
+        //Invite not found
+        return res.status(404).json({
+            message: "Cannot accept non-existent invite."
+        });
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).json({ 
+            message: "Server error. Contact support or try again later." 
+        }); 
+    }
+}
+
+//PUT request for /users/:userId
+//Updates a user with given information
+async function updateUser(req, res)
+{
+    try
+    {
+        const { userId } = req.params;
+
+        //Find user
+        const user = await User.findById(userId);
+        if (user)
+        {
+            //If id of token matches requested user
+            if (userId == req.user.userId)
+            {
+                const passedFields = Object.keys(req.body);
+                const validFields = Object.keys(User.schema.paths);
+                const filteredFields = passedFields.filter(field => validFields.includes(field));
+
+                if (filteredFields.includes("password"))
+                {
+                    //Hash new password
+                    const salt = await bcrypt.genSalt(saltRounds);
+                    const hash = await bcrypt.hash(password, salt);
+                    user.password = hash;
+                    filteredFields.splice(filterdFields.indexOf("password"), 1); //Remove password field
+                }
+
+                filteredFields.forEach(field => {
+                    if (req.body[field] != undefined) {
+                        user[field] = req.body[field];
+                    }
+                });
+
+                try {
+                    await user.save();
+                } catch (error) 
+                {
+                    console.error(error.message);
+
+                    //Mongoose schema validation error
+                    if (error instanceof mongoose.Error.ValidationError) 
+                    {
+                        return res.status(400).json({
+                            message: error.message
+                        });
+                    }
+                    //Other error
+                    return res.status(500).json({ 
+                        message: "Internal server error. Contact support or try again later." 
+                    });
+                }
+
+                //User saved without error
+                return res.status(200).json({
+                    message: "User updated successfully."
+                });
+            }
+            //Id of token does not match requested user
+            return res.status(403).json({
+                message: "You do not have permission to edit this user."
+            });
+        }
+        //User not found
+        return res.status(404).json({
+            message: "Cannot edit non-existent user."
+        });
+    } 
+    catch (error) {
+        console.error(error.message);
+        res.status(500).json({ 
+            message: "Server error. Contact support or try again later." 
+        }); 
+    }
+}
+
 module.exports = {
     getUser,
     getPlanets,
     getInvites,
+    acceptInvite,
+    declineInvite,
+    updateUser,
 }

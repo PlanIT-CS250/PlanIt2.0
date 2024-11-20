@@ -13,6 +13,13 @@ router.get("/:userId/planets", middleware.authenticateJWT, middleware.authentica
 //Returns all planet invites for a user given their id
 router.get("/:userId/invites", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), controller.getInvites);
 
+///----------POST REQUESTS----------
+//Accepts a planet invite given its id
+router.post('/invites/:inviteId/accept', middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.acceptInvite);
+router.post('/invites/:inviteId/decline', middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.declineInvite);
 
+//----------PUT REQUESTS----------
+//Updates a user with given information
+router.put('/:userId', middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.updateUser);
 
 module.exports = router;

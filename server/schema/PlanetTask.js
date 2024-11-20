@@ -15,9 +15,18 @@ const planetTaskSchema = new mongoose.Schema({
         required: true,
         validate: {
             validator: v => v.length > 1 && v.length < 30,
-            message: "Task content must be between 1 and 30 characters"
+            message: "Task content must be between 1 and 30 characters."
         }
-      },
+    },
+    order: {
+        type: Number,
+        required: false,
+        default: 1,
+        validate: {
+            validator: v => v > 0,
+            message: "Order must be greater than 0."
+        }
+    },
     createdAt: {
         type: Date,
         default: () => Date.now(),

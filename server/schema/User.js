@@ -1,5 +1,7 @@
 const mongoose = require('mongoose');
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/; //Regex pattern of typical email format
+const pfpLinkRegex = /^(https?:\/\/)?(www\.)?dropbox\.com\/(?:s|sh|sc|l)\/[A-Za-z0-9_-]+\/?[A-Za-z0-9_-]*(?:\?dl=\d)?$/;
+
  
 const userSchema = new mongoose.Schema({
   username: {
@@ -39,6 +41,15 @@ const userSchema = new mongoose.Schema({
   password: {
     type: String,
     required: true
+  },
+  pfpLink: {
+    type: String,
+    required: false,
+    default: "https://www.dropbox.com/scl/fi/70i59or3zlud8x9ry68uy/pfp.jpg?rlkey=z603j94uipjob6nydea116pxw&st=6vjn56sp&dl=0",
+    validate: {
+      validator: v => pfpLinkRegex.test(v),
+      message: "Invalid profile picture link."
+    }
   },
   role: {
     type: String,

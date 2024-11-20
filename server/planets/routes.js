@@ -22,6 +22,10 @@ router.post("/:planetId/invite", middleware.authenticateJWT, middleware.authenti
 //----------PUT REQUESTS----------
 //Updates a task given its updated fields
 router.put("/tasks/:taskId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.updateTask);
+//Promote a user to owner given planetId and userId
+router.put("/:planetId/users/:userId/promote", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.promoteUser);
+//Updates a planet given its updated fields
+router.put("/:planetId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.updatePlanet);
 
 //----------DELETE REQUESTS----------
 //Deletes a planet given its id
@@ -30,5 +34,7 @@ router.delete("/:planetId", middleware.authenticateJWT, middleware.authenticateR
 router.delete("/columns/:columnId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.deleteColumn);
 //Deletes a task given its id
 router.delete("/tasks/:taskId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.deleteTask);
+//Removes a user from planet given planetId and userId
+router.delete("/:planetId/users/:userId", middleware.authenticateJWT, middleware.authenticateRole(["user", "admin"]), middleware.limiter, controller.removeUser);
 
 module.exports = router;
