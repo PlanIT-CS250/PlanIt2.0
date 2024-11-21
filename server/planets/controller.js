@@ -73,7 +73,7 @@ async function createPlanet(req, res)
 {
     try
     {
-        const { name, description, ownerId } = req.body;
+        const { name, description, ownerId, theme, color } = req.body;
         if (!name || !description || !ownerId)
         {
             return res.status(400).json({
@@ -93,6 +93,12 @@ async function createPlanet(req, res)
                     name: name,
                     description: description,
                 });
+                if (color) {
+                    newPlanet.color = color;
+                }
+                if (theme) {
+                    newPlanet.theme = theme;
+                }
 
                 try {
                     await newPlanet.save();
