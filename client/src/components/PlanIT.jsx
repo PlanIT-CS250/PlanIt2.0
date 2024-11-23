@@ -304,7 +304,7 @@ const handleDragEnd = (event) => {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="hub-nav-right">
-          <NavLink to="/planetsettings" className="settings">
+          <NavLink to={`/planets/${planetId}/planetsettings/`} className="settings">
             <FaCog className="settings-icon" />
           </NavLink>
           <div className="profile" onClick={() => setDropdownOpen(!isDropdownOpen)}>
