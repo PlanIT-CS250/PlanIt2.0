@@ -8,10 +8,10 @@ import logoImage from '../assets/logo.png';
 import { FaCog } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 import axios from 'axios';
+import ThemeDrop from './Dropdown';
 import ColorWheel from './ColorPicker';
 import '../styles/Dropdown.css';
 import '../styles/ColorPicker.css';
-import Dropdown from 'react-bootstrap/Dropdown';
 
 function Hub() {
     const [cards, setCards] = useState([]);
@@ -26,9 +26,6 @@ function Hub() {
     const [newCardDesc, setNewCardDesc] = useState("Enter Description");
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
-    const [theme, setTheme] = useState();
-    const [color, setColor] = useState();
-    const onClose = () => setOpenModal(false);
 
     //Grab token from local storage
     useEffect(() => {
@@ -202,9 +199,7 @@ function Hub() {
                     {
                         name: newCardTitle,
                         description: newCardDesc,
-                        ownerId: userId,
-                        color: color,
-                        theme: theme
+                        ownerId: userId
                     },
                     {
                         headers: {
@@ -307,8 +302,6 @@ function Hub() {
     };
 
     const Modal = ({open,onClose, createPlanet}) => {
-        
-        console.log("model opened");
         if(!open) return null
         return(
             <div onClick={onClose} className='backblur'>
@@ -336,85 +329,6 @@ function Hub() {
             </div>
         )
     }
-
-    const ColorPicker = () => {
-      
-        // Function to handle color change
-        const handleChange = (newColor) => {
-          setColor(newColor.hex);
-        };
-      
-        // Function to move the preset colors section out of the SketchPicker
-        useEffect(() => {
-          const presetColors = document.querySelector('.sketch-picker .flexbox-fix:last-child');
-          if (presetColors) {
-            presetColors.style.position = 'absolute';
-            presetColors.style.top = '0';
-            presetColors.style.left = '100%';
-            presetColors.style.transform = 'rotate(90deg) translateX(150px) translateY(63.5px)';
-            presetColors.style.width = '185px';
-            presetColors.style.border = '1px solid #d9d9d9';
-            presetColors.style.borderRadius = '5px';
-            presetColors.style.paddingLeft = '15px';
-          }
-        }, []);
-        //48 
-      
-        // Define the preset colors with one color removed
-        const presetColors = [
-          '#000000', '#00FF00', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
-          '#FFFFFF', '#FF0000', '#0000FF', '#B8E900', '#FF00FF', '#4A4A4A', '#9B9B9B'
-        ];
-      
-        return (
-          <div className="sketchpicker-container">
-            {/* Div to display the color preview */}
-            <div
-              className="colorPreview"
-              style={{
-                backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-              }}
-            />
-            {/* Always render the SketchPicker */}
-            <SketchPicker
-              color={color}
-              onChange={handleChange}
-              className="sketch-picker" // Add custom class
-              presetColors={presetColors} // Set the preset colors
-            />
-          </div>
-        );
-      };
-
-      function ThemeDrop() {
-        const [showMenu, setShowMenu] = useState(false);
-      
-        const handleToggle = (isOpen) => {
-          setShowMenu(isOpen);
-        };
-
-        const themes = {
-            'Theme 1': ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3'],
-            'Theme 2': ['#FF3333', '#33FF33', '#3333FF', '#FFFF33', '#FF33FF'],
-            'Theme 3': ['#5733FF', '#57FF33', '#FF3357', '#33F3FF', '#F333FF'],
-            'None': []
-        };
-      
-        return (
-          <Dropdown className="dropdown" show={showMenu} onToggle={handleToggle}>
-            <Dropdown.Toggle variant="success" id="dropdown-basic">
-              Theme Picker ▼
-            </Dropdown.Toggle>
-      
-            <Dropdown.Menu className={`dropdown-menu ${showMenu ? 'show' : ''}`}>
-              <Dropdown.Item onClick={() => setTheme(themes['Theme 1'])}>Theme 1</Dropdown.Item>
-              <Dropdown.Item onClick={() => setTheme(themes['Theme 2'])}>Theme 2</Dropdown.Item>
-              <Dropdown.Item onClick={() => setTheme(themes['Theme 3'])}>Theme 3</Dropdown.Item>
-              <Dropdown.Item onClick={() => setTheme('Null')}>None</Dropdown.Item>
-            </Dropdown.Menu>
-          </Dropdown>
-        );
-      }
 
     return (
         <div className="hub-container">
@@ -501,6 +415,6 @@ function Hub() {
             </div>
         </div>
     );
-
 }
+
 export default Hub;

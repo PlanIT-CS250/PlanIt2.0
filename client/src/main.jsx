@@ -24,7 +24,6 @@ createRoot(document.getElementById('root')).render(
           <Route path="/register" element={<Register />} />
             <Route path="/hub" element={<Hub />} />
             <Route path="/planets/:id" element={<Planets />} />
-            <Route path="/planets/:id/planetsettings/" element={<PlanetSettings />} />
       </Routes>
     </Router>
   //</StrictMode>,

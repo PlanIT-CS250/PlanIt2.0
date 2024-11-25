@@ -24,7 +24,7 @@ const planetSchema = new mongoose.Schema({
     required: false,
     default: "#b5b3b3",
     validate: {
-      validator: v => hexRegex.test(v) || v == null,
+      validator: v => hexRegex.test(v),
       message: "Planet color must be a valid hex code."
     }
   },
@@ -36,7 +36,7 @@ const planetSchema = new mongoose.Schema({
       {
         validator: v => {
           v.forEach(hex => {
-            if (!hexRegex.test(hex) && hex != null) { return false; }
+            if (!hexRegex.test(hex)) { return false; }
           });
           return true;
         },
