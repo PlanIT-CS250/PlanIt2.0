@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { DndContext, useDraggable, useDroppable } from '@dnd-kit/core';
+import { arrayMove, useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
 import { NavLink } from 'react-router-dom';
 import { useParams } from 'react-router-dom' //To access the url parameters
 import { useNavigate } from 'react-router-dom'; //To navigate to other pages in the app
@@ -236,45 +238,72 @@ async function updateTask(taskId, changes)
 const handleDragEnd = (event) => {
   const { active, over } = event;
 
-  if (!over) return; // Exit if not hovering over a valid drop area
+  if (!over || active.id === over.id) return; // Exit if no drop target or no change
 
-  // Find the source column (the column the item is being dragged from)
   const sourceColumn = columns.find((column) =>
-    column.tasks.some((item) => item.id === active.id)
+    column.tasks.some((task) => task.id === active.id)
   );
 
-  // Find the destination column (the column the item is being dropped onto)
-  const destinationColumn = columns.find((column) => column.id === over.id);
+  const destinationColumn = columns.find((column) =>
+    column.tasks.some((task) => task.id === over.id)
+  );
 
-  // Proceed if the source and destination columns are different
-  if (sourceColumn && destinationColumn && sourceColumn.id !== destinationColumn.id) {
-    // Create copies of the source and destination task arrays
-    const sourceItems = Array.from(sourceColumn.tasks);
-    const destinationItems = Array.from(destinationColumn.tasks);
+  if (!sourceColumn || !destinationColumn) return; // Exit if either column is not found
 
-    // Find the index of the moved item in the source column
-    const [movedItem] = sourceItems.splice(
-      sourceItems.findIndex((item) => item.id === active.id),
-      1
+
+  // If sorting within the same column
+  if (sourceColumn.id === destinationColumn.id) {
+    const columnIndex = columns.findIndex((column) => column.id === sourceColumn.id);
+
+    const updatedTasks = arrayMove(
+      sourceColumn.tasks,
+      sourceColumn.tasks.findIndex((task) => task.id === active.id),
+      sourceColumn.tasks.findIndex((task) => task.id === over.id)
     );
 
-    // Add the moved item to the destination column
-    destinationItems.push(movedItem);
-    updateTask(movedItem.id, { columnId: destinationColumn.id });
+    // Update state with reordered tasks
+    const updatedColumns = [...columns];
+      updatedColumns[columnIndex] = { 
+      ...sourceColumn,
+      tasks: updatedTasks 
+    };
 
-    // Update the columns state
-    /*setColumns((prevColumns) => 
-      prevColumns.map((column) => {
-        if (column.id === sourceColumn.id) {
-          return { ...column, tasks: sourceItems }; // Update source column
-        }
-        if (column.id === destinationColumn.id) {
-          return { ...column, tasks: destinationItems }; // Update destination column
-        }
-        return column; // Return other columns unchanged
-      })
-    );*/
+    setColumns(updatedColumns); // Persist new state
+
+    console.log(updatedTasks);
+    console.log(sourceColumn);
+    console.log(destinationColumn);
+
+    // Save the updated order of the task in collum
+
+    updateTask(active.id, { columnId: sourceColumn.id, order: updatedTasks.map(task => task.id) });
+
+    return;
   }
+
+  // If moving task between different columns
+  const sourceColumnIndex = columns.findIndex((column) => column.id === sourceColumn.id);
+  const destinationColumnIndex = columns.findIndex((column) => column.id === destinationColumn.id);
+
+  const sourceTasks = [...sourceColumn.tasks];
+  const [movedTask] = sourceTasks.splice(
+    sourceTasks.findIndex((task) => task.id === active.id),
+    1
+  );
+
+  const destinationTasks = [...destinationColumn.tasks];
+  destinationTasks.splice(
+    destinationTasks.findIndex((task) => task.id === over.id),
+    0,
+    movedTask
+  );
+
+  // Update state with moved tasks
+  const updatedColumns = [...columns];
+  updatedColumns[sourceColumnIndex] = { ...sourceColumn, tasks: sourceTasks };
+  updatedColumns[destinationColumnIndex] = { ...destinationColumn, tasks: destinationTasks };
+
+  setColumns(updatedColumns); // Persist new state
 };
 
   //Edits the content of a card
@@ -355,16 +384,19 @@ function Column({ id, name, items, createTask, editCardContent }) {
   return (
     <div ref={setNodeRef} className="column">
       <h3>{name}</h3>
-      <div className="cards-container">
-        {items.map((item) => (
-          <DraggableCard
-            key={item.id}
-            id={item.id}
-            content={item.content}
-            onDoubleClick={() => editCardContent(id, item.id)}
-          />
-        ))}
-      </div>
+      <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
+        <div className="cards-container">
+          {items.map((item) => (
+            <DraggableCard
+              key={item.id}
+              id={item.id}
+              content={item.content}
+              onDoubleClick={() => editCardContent(id, item.id)}
+            />
+          ))}
+        </div>
+      </SortableContext>
+
       <button className="add-card-button" onClick={() => createTask(id)}>
         + Add Card
       </button>
@@ -374,13 +406,14 @@ function Column({ id, name, items, createTask, editCardContent }) {
 
 // Draggable card component
 function DraggableCard({ id, content, onDoubleClick }) {
-  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({ id });
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
+
+
   const style = {
-    position: isDragging ? 'absolute' : 'relative',
-    transform: transform ? `translate3d(${transform.x}px, ${transform.y}px, 0)` : undefined,
-    zIndex: isDragging ? 1000 : 1,
-    boxShadow: isDragging ? '0 4px 12px rgba(0, 0, 0, 0.3)' : '0 2px 4px rgba(0, 0, 0, 0.15)',
-    transition: isDragging ? 'none' : 'all 0.2s',
+    transform: CSS.Transform.toString(transform), // Safe transform values
+    transition, // Smooth transitions
+    zIndex: isDragging ? 1000 : 1, // Bring the dragged card to the top
+    boxShadow: isDragging ? '0 4px 12px rgba(0, 0, 0, 0.3)' : 'none',
   };
 
   return (
@@ -390,11 +423,12 @@ function DraggableCard({ id, content, onDoubleClick }) {
       {...listeners}
       {...attributes}
       className="card"
-      onDoubleClick = {onDoubleClick}
+      onDoubleClick={onDoubleClick}
     >
       {content}
     </div>
   );
 }
+
 
 export default PlanIT;
