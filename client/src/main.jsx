@@ -23,7 +23,7 @@ createRoot(document.getElementById('root')).render(
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
             <Route path="/hub" element={<Hub />} />
-            <Route path="/planets/:id" element={<Planets />} />
+            <Route path="/planets/:planetId" element={<Planets />} />
             <Route path="/planets/:id/planetsettings/" element={<PlanetSettings />} />
       </Routes>
     </Router>

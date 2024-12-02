@@ -23,16 +23,16 @@ function PlanIT() {
   const [planet, setPlanet] = useState();
   const [planetCollaborators, setPlanetCollaborators] = useState();
   const [tables, setTables] = useState([]);
-  const { id } = useParams(); //Id passed in url parameters
-  const planetId = id;
+  const { planetId } = useParams(); //Id passed in url parameters
   const navigate = useNavigate();
 
   //Grab token from local storage
   useEffect(() => {
     try {
+        //If token not found, navigate to hub
         if (!localStorage.getItem('token'))
         {
-            navigate('/hub'); //Redirect to hub
+            navigate('/hub');
         }
         setToken(localStorage.getItem('token'));
     }
@@ -68,48 +68,53 @@ useEffect(() => {
           });
 
           setUser(res.data.user);
+
+      //If user not found, navigate to login
       } catch (error) {
-          navigate('/hub'); 
+          navigate('/'); 
       }
   };
   if (userId)
   {
       fetchUserData();
   }
-}, [userId]); // useEffect hooks runs when userId changes
+}, [userId]);
 
 //Fetch planet
 useEffect(() => {
   const fetchPlanet = async () => {
-      try {
-          const res = await axios.get(`http://localhost:3000/planets/${planetId}`, {
-              headers: {
-                  'Authorization': `Bearer ${token}`
-              }
-          });
-          setPlanet(res.data.planet);
-          setPlanetCollaborators(res.data.collaborators);
-
-      } catch (error)
-      {
-        //Axios error
-        if (typeof error.response.status != undefined)
-        {
-          if (error.response.status == 404 || error.response.status == 400)
-          {
-            alert("No planet found.");
-          }
-          else
-          {
-            navigate('/hub');
-          }
-        }
-        //Non-axios error
-        else
-        {
-          navigate("/hub");
-        }
+    let res = null;
+    try {
+        res = await axios.get(`http://localhost:3000/planets/${planetId}`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+    } catch (error)
+    {
+      if (error.response) {
+        //Server returned 4xx or 5xx status code
+        alert(error.response.data.message);
+        console.error(error.response.data);
+        console.error(error.response.status);
+        console.error(error.response.headers);
+      } else if (error.request) {
+        //Request was made but recieved no response from server
+        alert("Internal server error. Contact support or try again later.")
+        console.error(error.request);
+      } else {
+        //Request was set up incorrectly
+        alert("There was an error retrieving this planet. Please try again later.");
+        console.error(error.message);
       }
+    }
+    if (res?.data?.planet && res?.data?.collaborators) {
+      setPlanet(res.data.planet);
+      setPlanetCollaborators(res.data.collaborators);
+    }
+    else {
+      navigate("/hub");
+    }
   };
   if (user)
   {
@@ -118,56 +123,75 @@ useEffect(() => {
 }, [user]);
 
 const fetchColumns = async () => {
-    const res = await axios.get(`http://localhost:3000/planets/${planetId}/columns`, {
+  let res = null;
+  try {
+    res = await axios.get(`http://localhost:3000/planets/${planetId}/columns`, {
       headers: {
           'Authorization': `Bearer ${token}`
       }
     });
-  const planetColumns = res.data.columns;
-  const columns = [];
+  } 
+  catch (error) 
+  {
+    if (error.response) {
+      //Server returned 4xx or 5xx status code
+      alert(error.response.data.message);
+      console.error(error.response.data);
+      console.error(error.response.status);
+      console.error(error.response.headers);
+    } else if (error.request) {
+      //Request was made but recieved no response from server
+      alert("Internal server error. Contact support or try again later.")
+      console.error(error.request);
+    } else {
+      //Request was set up incorrectly
+      alert("There was an error retrieving this planet's columns and tasks. Please try again later.");
+      console.error(error.message);
+    }
+  }
+  if (res?.data?.columns)
+  {
+    const planetColumns = res.data.columns;
+    const columns = [];
 
-  //Iterate through planet's columns
-  planetColumns.forEach(planetColumn => {
-    const tasks = [];
-    //Add tasks to each column
-    planetColumn.tasks.forEach(planetTask => {
-      const taskObj = {};
-      taskObj.id = planetTask._id;
-      taskObj.content = planetTask.content;
-      tasks.push(taskObj);
+    //Iterate through planet's columns
+    planetColumns.forEach(planetColumn => {
+      const tasks = [];
+      //Add tasks to each column
+      planetColumn.tasks.forEach(planetTask => {
+        //Add data to task
+        const taskObj = {};
+        taskObj.id = planetTask._id;
+        taskObj.content = planetTask.content;
+        tasks.push(taskObj); //Push task to list of tasks in column
+      });
+      //Push column to list of columns
+      columns.push({
+        id: planetColumn._id,
+        name: planetColumn.name,
+        tasks: tasks
+      });
     });
-    columns.push({
-      id: planetColumn._id,
-      name: planetColumn.name,
-      tasks: tasks
-    });
-  });
-  //Display columns and tasks
-  setColumns(columns);
+    //Display columns and tasks
+    setColumns(columns);
+  }
+  else {
+    navigate("/hub");
+  }
 }
 
+//Fetch all columns and their tasks for planet
 useEffect(() => {
   if (planet)
   {
-    try {
-      fetchColumns();
-    }
-    catch(error) {
-      console.log(error);
-    }
+    fetchColumns();
   }
 }, [planet]);
 
-async function createColumn()
+//Saves a new column to database
+async function createColumn(name)
 {
-  const name = prompt("Enter column name:");
-  if (name.length < 1 || name.length > 15)
-  {
-    alert("Column name must be between 1 and 15 characters.");
-    return;
-  }
-  
-  try
+  try 
   {
     const res = await axios.post(`http://localhost:3000/planets/${planet._id}/columns`, 
       {
@@ -178,42 +202,92 @@ async function createColumn()
               'Authorization': `Bearer ${token}`
           }
       }
-  );
-  fetchColumns();
-
-  } catch(error) {
-    console.log(error);
+    );
+  } 
+  catch (error)
+  {
+    if (error.response) {
+      //Server returned 4xx or 5xx status code
+      alert(error.response.data.message);
+      console.error(error.response.data);
+      console.error(error.response.status);
+      console.error(error.response.headers);
+    } else if (error.request) {
+      //Request was made but recieved no response from server
+      alert("Internal server error. Contact support or try again later.")
+      console.error(error.request);
+    } else {
+      //Request was set up incorrectly
+      alert("There was an error creating a new column. Please try again later.");
+      console.error(error.message);
+    }
   }
+
 }
 
-async function createTask(columnId)
+//Prompt the user for a column name, then saves the new column to database
+async function promptCreateColumn()
 {
-  try
+  const name = prompt("Enter column name:");
+  if (name.length < 1 || name.length > 15)
   {
-    const newCardContent = prompt("Enter new card content:");
-    if (newCardContent && newCardContent.length <= 30 && newCardContent.length >= 1)
-    {
-      const res = await axios.post(`http://localhost:3000/planets/columns/${columnId}/task`, 
+    alert("Column name must be between 1 and 15 characters.");
+    return;
+  }
+  
+  await createColumn(name);
+  await fetchColumns();
+}
+
+//Saves a new task to database
+async function createTask(columnId, content)
+{
+  try 
+  {
+    const res = await axios.post(`http://localhost:3000/planets/columns/${columnId}/task`, 
       {
         columnId,
-        content: newCardContent
+        content
       },
       {
           headers: {
               'Authorization': `Bearer ${token}`
           }
       }
-      );
-      fetchColumns();
+    );
+  }
+  catch (error)
+  {
+    if (error.response) {
+      //Server returned 4xx or 5xx status code
+      alert(error.response.data.message);
+      console.error(error.response.data);
+      console.error(error.response.status);
+      console.error(error.response.headers);
+    } else if (error.request) {
+      //Request was made but recieved no response from server
+      alert("Internal server error. Contact support or try again later.")
+      console.error(error.request);
+    } else {
+      //Request was set up incorrectly
+      alert("There was an error creating a new task. Please try again later.");
+      console.error(error.message);
+    }
+  } 
+}
+
+//Prompts a user for task content, then saves the new task to database
+async function promptCreateTask(columnId)
+{
+    const content = prompt("Enter new card content:");
+    if (content?.length <= 30 && content?.length >= 1)
+    {
+      await createTask(columnId, content);
+      await fetchColumns();
     }
     else {
       alert("Task content must be between 1 and 30 characters.");
     }
-  }
-  catch(error)
-  {
-    console.log(error);
-  }
 }
 
 async function updateTask(taskId, changes)
@@ -270,13 +344,8 @@ const handleDragEnd = (event) => {
 
     setColumns(updatedColumns); // Persist new state
 
-    console.log(updatedTasks);
-    console.log(sourceColumn);
-    console.log(destinationColumn);
-
-    // Save the updated order of the task in collum
-
-    updateTask(active.id, { columnId: sourceColumn.id, order: updatedTasks.map(task => task.id) });
+    //Send request to server to update task
+    updateTask(active.id, { order: updatedTasks.map(task => task.id).indexOf(active.id) + 1 });
 
     return;
   }
@@ -304,6 +373,9 @@ const handleDragEnd = (event) => {
   updatedColumns[destinationColumnIndex] = { ...destinationColumn, tasks: destinationTasks };
 
   setColumns(updatedColumns); // Persist new state
+
+  //Send request to server to update task
+  updateTask(active.id, { order: destinationTasks.indexOf(movedTask) + 1, columnId: destinationColumn.id });
 };
 
   //Edits the content of a card
@@ -357,7 +429,7 @@ const handleDragEnd = (event) => {
           </div>
         </div>
       </div>
-      <button onClick={() => createColumn()}>Add column</button>
+      <button onClick={() => promptCreateColumn()}>Add column</button>
       {/* Board */}
       <DndContext onDragEnd={handleDragEnd}>
         <div className="board">
@@ -367,7 +439,7 @@ const handleDragEnd = (event) => {
               id={column.id}
               name={column.name}
               items={column.tasks}
-              createTask={createTask}
+              createTask={promptCreateTask}
               editCardContent={editCardContent}
             />
           ))}

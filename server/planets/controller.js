@@ -502,178 +502,155 @@ async function updateTask(req, res)
     try
     {
         const { taskId } = req.params; // /planets/tasks/___ <-
-        const { columnId, assignedUserId, content, order } = req.body;
+        const passedFields = Object.keys(req.body);
+        const validFields = Object.keys(PlanetTask.schema.paths);
+        const filteredFields = passedFields.filter(field => validFields.includes(field));
+        if (!filteredFields.length) {
+            //Task not updated
+            return res.status(204);
+        }
 
         //Find task
         const task = await PlanetTask.findById(taskId);
-        const originalTask = task; //Copy of original task in case of potential data loss
         if (task)
         {
             //Find column
             const currColumn = await PlanetColumn.findById(task.columnId);
             if (currColumn)
             {
-                //If id of token is a collaborator of planet which task belongs to
-                const planetUserMatch = await PlanetCollaborator.exists({ planetId: currColumn.planetId, userId: req.user.userId });
-                if (planetUserMatch || req.user.role == "admin")
+                //Find planet
+                const planet = await Planet.findById(currColumn.planetId);
+                if (planet)
                 {
-                    //If column is being changed
-                    if (columnId)
+                    //If id of token is a member of planet
+                    const planetUserMatch = await PlanetCollaborator.exists({ planetId: currColumn.planetId, userId: req.user.userId });
+                    if (planetUserMatch || req.user.role == "admin")
                     {
-                        //If new column exists
-                        const newColumn = await PlanetColumn.findById(columnId);
-                        if (newColumn)
+                        if (filteredFields.includes("content"))
                         {
-                            //If new column is not the current column
-                            if (columnId != task.columnId)
+                            task.content = req.body.content;
+                        }
+                        if (filteredFields.includes("assignedUserId"))
+                        {
+                            const assignedUser = await User.findById(req.body.assignedUserId);
+                            if (assignedUser)
                             {
-                                //Reorder current column tasks
-                                const currColTasks = await PlanetTask.find({ columnId: task.columnId }).sort({ order: 1});
-                                for (let i = task.order; i < currColTasks.length; i++)
+                                planetUserMatch = await PlanetCollaborator.exists({ planetId: planet._id, userId: assignedUser._id });
+                                if (planetUserMatch)
                                 {
-                                    currColTasks[i].order -= 1;
-                                    await currColTasks[i].save();
+                                    task.assignedUserId = assignedUser._id;
                                 }
+                                return res.status(400).json({
+                                    message: "New assigned user does not have permission to work on this task."
+                                });
+                            }
+                            return res.status(404).json({
+                                message: "New assigned user not found."
+                            });
+                        }
+                        if (filteredFields.includes("order"))
+                        {
+                            const currColumnTasks = await PlanetTask.find({ columnId: currColumn._id });
+                            var newOrder = req.body.order;
+                            if (newOrder < 1) {
+                                //If order is too low, place task at bottom of column
+                                newOrder = 1;
+                            }
 
-                                //Insert task into new column
-                                const newColTasks = await PlanetTask.find({ columnId }).sort({ order: 1});
-                                task.columnId = columnId;
-
-                                //If order is provided
-                                if (order)
+                            if (filteredFields.includes("columnId"))
+                            {
+                                //Find new column
+                                const newColumn = await PlanetColumn.exists({ _id: req.body.columnId });
+                                if (newColumn)
                                 {
-                                    //If valid order
-                                    if (order <= newColTasks.length + 1 && order > 0)
+                                    const newColumnTasks = await PlanetTask.find({ columnId: newColumn._id });
+                            
+                                    if (newOrder > newColumnTasks.length + 1)
                                     {
-                                        for (let i = order - 1; i < newColTasks.length; i++)
-                                        {
-                                            newColTasks[i].order += 1;
-                                            await newColTasks[i].save();
-                                        }
-                                        task.order = order;
+                                        //If order is too high, place task at top of column
+                                        newOrder = newColumnTasks.length + 1;
                                     }
-                                    //Place task at bottom of column by default
-                                    else if (newColTasks.length) {
-                                        task.order = newColTasks[newColTasks.length - 1].order + 1;
-                                    }
-                                    //Place task at top of empty column
-                                    else {
-                                        task.order = 1;
-                                    }
+
+                                    //Reorder tasks in current column
+                                    //Decrement order of tasks placed above task being edited
+                                    await PlanetTask.updateMany(
+                                        { columnId: currColumn._id, order: { $gt: task.order } },
+                                        { $inc: { order: -1 } }
+                                    );
+
+                                    //Insert task into new column
+                                    //Increment order of tasks placed above new selected order
+                                    await PlanetTask.updateMany(
+                                        { columnId: newColumn._id, order: { $gte: newOrder } },
+                                        { $inc: { order: 1 } }
+                                    );
+                                    task.columnId = newColumn._id;
+                                    task.order = newOrder;
                                 }
-                                //Place task at bottom of column by default
-                                else if (newColTasks.length) {
-                                    task.order = newColTasks[newColTasks.length - 1].order + 1;
-                                }
-                                //Place task at top of empty column
                                 else {
-                                    task.order = 1;
+                                    return res.status(404).json({
+                                        message: "New column not found."
+                                    }); 
                                 }
                             }
-                        }
-                        //Column not found
-                        else {
-                            return res.status(404).json({
-                                message: "Cannot move task to non-existent column."
-                            });
-                        }
-                    }
-                    //If assigned user is being changed
-                    if (assignedUserId)
-                    {
-                        //If valid assigned user change
-                        const newUser = await User.findById(assignedUserId);
-                        if (newUser)
-                        {
-                            task.assignedUserId = assignedUserId;
-                        }
-                        //User not found
-                        else {
-                            return res.status(404).json({
-                                message: "Cannot assign task to non-existent user."
-                            });
-                        }
-                    }
-                    //If order is being changed in the current column
-                    if (order && !newColumn)
-                    {
-                        //If valid order
-                        if (order <= currColTasks.length + 1 && order > 0)
-                        {
-                            for (let i = order - 1; i < currColTasks.length; i++)
+                            else
                             {
-                                currColTasks[i].order += 1;
-                                await currColTasks[i].save();
+                                //Reorder tasks in current column
+
+                                //Decrement order of tasks placed above task being edited
+                                await PlanetTask.updateMany(
+                                    { columnId: currColumn._id, order: { $gt: task.order } },
+                                    { $inc: { order: -1 } }
+                                );
+                                //Increment order of tasks placed aboved new selected order
+                                await PlanetTask.updateMany(
+                                    { columnId: currColumn._id, order: { $gte: newOrder } },
+                                    { $inc: { order: 1 } }
+                                );
+                                task.order = newOrder;
                             }
-                            task.order = order;
                         }
-                        //Place task at bottom of column by default
-                        else if (currColTasks.length) {
-                            task.order = currColTasks[currColTasks.length - 1].order + 1;
-                        }
-                        //Place task at top of empty column
-                        else {
-                            task.order = 1;
-                        }
-                    }
-                    //If content is being changed
-                    if (content)
-                    {
-                        task.content = content;
-                    }
+                            //Attempt to save task
+                            try {
+                                await task.save();
+                            } catch (error) 
+                            {
+                                console.error(error.message);
 
-                    task.updatedAt = Date.now();
-                    currColumn.updatedAt = Date.now();
-                    const planet = await Planet.findById(currColumn.planetId);
-                    if (planet) {
-                        planet.updatedAt = Date.now();
-                    }
-                    if (typeof newColumn != undefined) { //If task was moved to a new column
-                        newColumn.updatedAt = Date.now();
-                    }
+                                //Mongoose schema validation error
+                                if (error instanceof mongoose.Error.ValidationError) 
+                                {
+                                    return res.status(400).json({
+                                        message: error.message
+                                    });
+                                }
+                                //Other error
+                                return res.status(500).json({ 
+                                    message: "Internal server error. Contact support or try again later." 
+                                });
+                            }
 
-                    //Attempt to save task
-                    try {
-                        await task.save();
-                    } catch (error) 
-                    {
-                        console.error(error.message);
-                        await PlanetTask.deleteOne({ _id: task._id }); //Delete possibly unintentionally created document
-                        await originalTask.save(); //Save original task
-
-                        //Mongoose schema validation error
-                        if (error instanceof mongoose.Error.ValidationError) 
-                        {
-                            return res.status(400).json({
-                                message: error.message
-                            });
-                        }
-                        //Other error
-                        return res.status(500).json({ 
-                            message: "Internal server error. Contact support or try again later." 
-                        });
+                            //Task saved without error
+                            return res.status(200).json({
+                                message: "Task updated successfully."
+                            }); 
                     }
-
-                    //Task saved without fail
-                    return res.status(200).json({
-                        message: "Task updated successfully.",
-                        updatedTask: task
+                    return res.status(403).json({
+                        message: "You do not have permission to edit this task."
                     });
                 }
-                //Id of token is not a collaborator of planet which task belongs to
-                return res.status(403).json({
-                    message: "User does not have permission to edit this task."
+                return res.status(404).json({
+                    message: "Task's planet not found."
                 });
             }
-            //Column not found
             return res.status(404).json({
-                message: "Cannot find column that tasks belongs to."
-            })
+                message: "Task's column not found."
+            });
         }
-        //Task not found
         return res.status(404).json({
-            message: "Cannot edit non-existent task."
+            message: "Task not found."
         });
+
     }
     catch(error) {
         console.error(error);
