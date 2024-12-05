@@ -12,6 +12,8 @@ import Planets from './components/PlanIT.jsx';
 import './styles/PlanIT.css';
 import PlanetSettings from './components/PlanetSettings.jsx';
 import './styles/PlanetSettings.css';
+import Logout from './components/Logout.jsx';
+import UserSettings from './components/UserSettings.jsx';
 
 
 createRoot(document.getElementById('root')).render(
@@ -25,6 +27,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/hub" element={<Hub />} />
             <Route path="/planets/:planetId" element={<Planets />} />
             <Route path="/planets/:planetId/settings/" element={<PlanetSettings />} />
+            <Route path="/logout" element={<Logout />} />
       </Routes>
     </Router>
   //</StrictMode>,

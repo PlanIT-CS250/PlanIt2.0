@@ -444,7 +444,7 @@ function Hub() {
                                 <div className="profile-options">
                                     <NavLink to="/quickstart">Open Quickstart</NavLink>
                                     <NavLink to="/profile">Profile</NavLink>
-                                    <NavLink to="/personal-settings">Personal settings</NavLink>
+                                    <NavLink to={`/users/${userId}/settings`}>Personal settings</NavLink>
                                     <NavLink to="/notifications">Notifications</NavLink>
                                     <NavLink to="/theme">Theme</NavLink>
                                     <NavLink to="/logout">Log out</NavLink>
