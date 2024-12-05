@@ -27,7 +27,7 @@ function Hub() {
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
     const [theme, setTheme] = useState();
-    const [color, setColor] = useState();
+    const [wcolor, setWcolor] = useState('#ffffff');
     const onClose = () => setOpenModal(false);
 
     //Grab token from local storage
@@ -203,7 +203,7 @@ function Hub() {
                         name: newCardTitle,
                         description: newCardDesc,
                         ownerId: userId,
-                        color: color,
+                        color: wcolor,
                         theme: theme
                     },
                     {
@@ -340,9 +340,11 @@ function Hub() {
     const ColorPicker = () => {
       
         // Function to handle color change
-        const handleChange = (newColor) => {
-          setColor(newColor.hex);
+        const handleChangeComplete = () => {
+          setwColor(color.hex);
         };
+
+        
       
         // Function to move the preset colors section out of the SketchPicker
         useEffect(() => {
@@ -368,17 +370,10 @@ function Hub() {
       
         return (
           <div className="sketchpicker-container">
-            {/* Div to display the color preview */}
-            <div
-              className="colorPreview"
-              style={{
-                backgroundColor: `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`,
-              }}
-            />
             {/* Always render the SketchPicker */}
             <SketchPicker
               color={color}
-              onChange={handleChange}
+              onChangeComplete={handleChangeComplete}
               className="sketch-picker" // Add custom class
               presetColors={presetColors} // Set the preset colors
             />

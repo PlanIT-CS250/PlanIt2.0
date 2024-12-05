@@ -111,7 +111,7 @@ useEffect(() => {
 
 
     return (
-        <div className="settingsContainer">
+        <div className="pSettingsContainer">
             <h1>Planet Settings</h1>
             <div className="nameDescription">  
                 <h2>{planet.name}</h2>
@@ -123,6 +123,9 @@ useEffect(() => {
                 <input 
                 type="text" 
                 placeholder="Planet Description" />
+            </div>
+            <div className="deleteButton">
+              <button>Delete Project</button>
             </div>
         </div>
     )
