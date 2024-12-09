@@ -22,8 +22,7 @@ function PlanIT() {
   const [user, setUser] = useState();
   const [planet, setPlanet] = useState();
   const [planetCollaborators, setPlanetCollaborators] = useState();
-  const { id } = useParams(); //Id passed in url parameters
-  const planetId = id;
+  const { planetId } = useParams(); //Id passed in url parameters
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
@@ -517,8 +516,12 @@ function CardModal({ isOpen, onRequestClose, card, updateTask }) {
 
   const handleSave = () => {
     if (content.length >= 1 && content.length <= 30) {
-      updateTask(card.id, { content, description, priority });
-      onRequestClose();
+      if (description.length >= 1 && description.length <= 500) {
+        updateTask(card.id, { content, description, priority });
+        onRequestClose();
+      } else {
+        alert("Task description must be between 1 and 500 characters.");
+      }
     } else {
       alert("Task content must be between 1 and 30 characters");
     }
