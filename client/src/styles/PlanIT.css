@@ -20,6 +20,8 @@
     width: 100%;
     max-height: 80vh;
     align-items: flex-start;    
+    display: flex;
+    overflow: visible; /* Ensure overflow is visible */
   }
   
   .planit-page .column {
@@ -243,7 +245,117 @@
     background-color: #f5f5f5;
 }
 
+.assigned-user-pfp {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    object-fit: cover;
+  }
 
+  .assigned-user {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+  }
   
+  .profile-picture {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+  }
+
+.custom-modal-overlay {
+    background-color: rgba(0, 0, 0, 0.75);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+  }
+  
+  .custom-modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 8px;
+    max-width: 500px;
+    width: 100%;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  
+  .custom-modal-content h2 {
+    margin-top: 0;
+    font-size: 24px;
+    margin-bottom: 10px;
+  } 
+
+  .custom-modal-content .description-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    padding-bottom: 200px;
+    padding-left: 30px;
+  }
+
+  .custom-modal-content .priority-label {
+    font-weight: bold;
+    margin-bottom: 5px;
+    padding-top: 125px;
+    padding-left: 30px;
+  }
+
+  .custom-modal-content textarea {
+    width: 95%;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: none;
+  }
+  
+  .custom-modal-content .title-content {
+    width: 95%;
+    height: 12px;
+    padding: 10px;
+    margin-bottom: 20px;
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    resize: none;
+  }
 
 
+  .custom-modal-content button {
+    padding: 10px 20px;
+    margin-right: 10px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+  }
+  
+  .custom-modal-content .save-button {
+    background-color: #007bff;
+    color: white;
+  }
+  
+  .custom-modal-content .save-button:hover {
+    background-color: #0056b3;
+  }
+  
+  .custom-modal-content .cancel-button {
+    background-color: #6c757d;
+    color: white;
+  }
+  
+  .custom-modal-content .cancel-button:hover {
+    background-color: #5a6268;
+  }

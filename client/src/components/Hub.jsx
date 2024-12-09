@@ -419,7 +419,6 @@ function Hub() {
                         <img src={logoImage} alt="Logo" className="logo-image" />
                     </NavLink>
                     <NavLink to="/teams" className="teams">Teams</NavLink>
-                    <NavLink to="/projects" className="projects">Projects</NavLink>
                 </div>
                 <div className="search-bar">
                     <input type="text" placeholder="Search..." />

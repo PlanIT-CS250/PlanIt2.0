@@ -116,24 +116,6 @@
 .registers-link:hover {
   color: #223373;
 }
-
-  
-   #togglePassword {
-     position: absolute;
-     top: 50%;
-     right: 0;
-     transform: translateY(-50%);
-     color: #999;
-     cursor: pointer;
-   }
-  
-   #togglePassword:hover {
-     color: #333;
-   }
-  
-   #password[type="password"] {
-     padding-right: 40px;
-   }  
   
 
 
