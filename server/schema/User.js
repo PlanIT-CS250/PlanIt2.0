@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
   pfpLink: {
     type: String,
     required: false,
-    default: "https://www.dropbox.com/scl/fi/70i59or3zlud8x9ry68uy/pfp.jpg?rlkey=z603j94uipjob6nydea116pxw&st=6vjn56sp&dl=0",
+    default: "default.jpg",
     validate: {
       validator: v => pfpLinkRegex.test(v),
       message: "Invalid profile picture link."

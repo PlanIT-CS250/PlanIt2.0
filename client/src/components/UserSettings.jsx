@@ -1,11 +1,48 @@
 import React from 'react';
+import axios from 'axios';
 import AvatarEditor from 'react-avatar-editor';
 
+const accessToken = "sl.CCci3gXmyVZumwbS0DBdl9Wc5a95VSz3oSwLzRll2jQJhrMJve1_M56EQwDxZoBLmHsrG4Un68EDecWtb9zCs5-pO7yYq4zx6s7aeOjUOzpzY87O0Qj5mIs3uBiF6iKws6RX4Exohuqc";
+
+// Submits an image (base64) to the dropbox folder
+async function submitImage(base64Image, fileName)
+{
+    // Convert Base64 image string to a Blob
+    const base64Data = base64Image.split(',')[1]; // Remove the "data:image/png;base64," prefix if present
+    const binaryData = atob(base64Data); // Decode Base64
+    const byteArray = new Uint8Array(binaryData.length);
+
+    for (let i = 0; i < binaryData.length; i++) {
+      byteArray[i] = binaryData.charCodeAt(i);
+    }
+
+    const blob = new Blob([byteArray], { type: 'application/octet-stream' });
+
+    const response = await axios.post(
+      'https://content.dropboxapi.com/2/files/upload',
+      blob, // File content as the request body
+      {
+        headers: {
+          'Authorization': `Bearer ${accessToken}`, // Access token
+          'Dropbox-API-Arg': JSON.stringify({
+            path: `/profile-pictures/${fileName}`, // Target path in Dropbox (e.g., /folder/image.png)
+            mode: 'add',
+            autorename: true,
+            mute: false
+          }),
+          'Content-Type': 'application/octet-stream' // Binary file format
+        }
+      }
+    );
+    console.log(response);
+
+}
 class UploadImage extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
             image: null,
+            fileName: null,
             allowZoomOut: false,
             position: { x: 0.5, y: 0.5 },
             scale: 1,
@@ -20,9 +57,13 @@ class UploadImage extends React.Component {
 
     handleNewImage = (e) => {
         if (e.target.files && e.target.files[0]) {
+            const file = e.target.files[0];
             const reader = new FileReader();
             reader.onload = (event) => {
-                this.setState({ image: event.target.result });
+                this.setState({ 
+                    image: event.target.result,
+                    fileName: file.name
+                });
             };
             reader.readAsDataURL(e.target.files[0]);
         }
@@ -46,7 +87,15 @@ class UploadImage extends React.Component {
         if (this.editor) {
             const canvas = this.editor.getImageScaledToCanvas().toDataURL();
             this.setState({ preview: canvas });
-            // Your submit logic here
+
+            try {
+                // Make put request to localhost:3000/users/:userId
+            }
+            catch (error) {
+
+            }
+
+            submitImage(this.state.image, this.state.fileName); // Run if request succeeds without error
         }
     };
 

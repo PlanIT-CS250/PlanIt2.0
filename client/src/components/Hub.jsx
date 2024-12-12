@@ -1,6 +1,6 @@
 // eslint-disable-next-line no-unused-vars
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom'; //To navigate to other pages in the app
+import { useNavigate, useRouteLoaderData } from 'react-router-dom'; //To navigate to other pages in the app
 import { NavLink } from 'react-router-dom';
 import '../styles/Hub.css';
 import profileImage from '../assets/profile.png';
@@ -11,6 +11,7 @@ import axios from 'axios';
 import '../styles/Dropdown.css';
 import Dropdown from 'react-bootstrap/Dropdown';
 import { SketchPicker } from 'react-color';
+import { Dropbox } from 'dropbox';
 
 function Hub() {
     const [cards, setCards] = useState([]);
@@ -28,6 +29,11 @@ function Hub() {
     const [wcolor, setWcolor] = useState('#FFFFFF');
     const [theme, setTheme] = useState();
     const onClose = () => setOpenModal(false);
+    const [pfp, setPfp] = useState('/');
+    const dbx = new Dropbox({
+        accessToken: "sl.CCci3gXmyVZumwbS0DBdl9Wc5a95VSz3oSwLzRll2jQJhrMJve1_M56EQwDxZoBLmHsrG4Un68EDecWtb9zCs5-pO7yYq4zx6s7aeOjUOzpzY87O0Qj5mIs3uBiF6iKws6RX4Exohuqc",
+        fetch: fetch.bind(window)
+    });
 
     //Grab token from local storage
     useEffect(() => {
@@ -171,6 +177,21 @@ function Hub() {
             fetchUserPlanets();
         }            
     }, [user]); // useEffect hooks runs when user changes
+
+
+    async function fetchPfp(url) {
+        let res = await dbx.filesDownload({
+            path: `/profile-pictures/${url}`
+        });
+        setPfp(URL.createObjectURL(res.result.fileBlob));
+    }
+
+    useEffect(() => {
+        if (user)
+        {
+            fetchPfp(user.pfpLink);
+        }
+    }, [user]);
 
 
     //Post new planet information to database
@@ -430,7 +451,7 @@ function Hub() {
                         <FaCog className="settings-icon" />
                     </NavLink>
                     <div className="profile" onClick={toggleDropdown}>
-                        <img src={profileImage} alt="Profile" className="profile-image" />
+                        <img src={pfp} alt="Profile" className="profile-image" />
                         {isDropdownOpen && (
                             <div className="profile-dropdown">
                                 <div className="profile-header">
