@@ -8,10 +8,9 @@ import logoImage from '../assets/logo.png';
 import { FaCog } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 import axios from 'axios';
-import ColorWheel from './ColorPicker';
 import '../styles/Dropdown.css';
-import '../styles/ColorPicker.css';
 import Dropdown from 'react-bootstrap/Dropdown';
+import { SketchPicker } from 'react-color';
 
 function Hub() {
     const [cards, setCards] = useState([]);
@@ -26,8 +25,8 @@ function Hub() {
     const [newCardDesc, setNewCardDesc] = useState("Enter Description");
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
+    const [wcolor, setWcolor] = useState('#FFFFFF');
     const [theme, setTheme] = useState();
-    const [wcolor, setWcolor] = useState('#ffffff');
     const onClose = () => setOpenModal(false);
 
     //Grab token from local storage
@@ -306,6 +305,53 @@ function Hub() {
         onClose();
     };
 
+    const ColorPicker = () => {
+      
+        // Function to handle color change
+        const handleChange = (newColor) => {
+          setWcolor(newColor.hex); // Save the color to the wcolor state
+        };
+      
+        // Function to move the preset colors section out of the SketchPicker
+        useEffect(() => {
+          const presetColors = document.querySelector('.sketch-picker .flexbox-fix:last-child');
+          if (presetColors) {
+            presetColors.style.position = 'absolute';
+            presetColors.style.top = '0';
+            presetColors.style.left = '100%';
+            presetColors.style.transform = 'rotate(90deg) translateX(150px) translateY(63.5px)';
+            presetColors.style.width = '185px';
+            presetColors.style.border = '1px solid #d9d9d9';
+            presetColors.style.borderRadius = '5px';
+            presetColors.style.paddingLeft = '15px';
+          }
+      }, []);
+      
+      const presetColors = [
+        '#000000', '#00FF00', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
+        '#FFFFFF', '#FF0000', '#0000FF', '#B8E900', '#FF00FF', '#4A4A4A', '#9B9B9B'
+      ];
+      
+        return (
+          <div className="sketchpicker-container">
+            <div
+              className="colorPreview"
+              style={{
+                backgroundColor: wcolor,
+              }}
+            />
+            {/* Always render the SketchPicker */}
+            <SketchPicker
+              color={wcolor}
+              onChange={handleChange}
+              className="sketch-picker" // Add custom class
+              presetColors={presetColors}
+            />
+
+          </div>
+        );
+      };
+
     const Modal = ({open,onClose, createPlanet}) => {
         
         console.log("model opened");
@@ -319,8 +365,7 @@ function Hub() {
                         <p onClick={onClose} className="closeBtn">X</p>
                         <div className="content">
                             <ThemeDrop/>
-                            <ColorWheel/>
-                            
+                            <ColorPicker/>
                         </div>
                         <div className="btnContainer">
                             <button className='btnPrimary' onClick={handleCreatePlanetAndClose}>
@@ -336,50 +381,7 @@ function Hub() {
             </div>
         )
     }
-
-    const ColorPicker = () => {
       
-        // Function to handle color change
-        const handleChangeComplete = () => {
-          setwColor(color.hex);
-        };
-
-        
-      
-        // Function to move the preset colors section out of the SketchPicker
-        useEffect(() => {
-          const presetColors = document.querySelector('.sketch-picker .flexbox-fix:last-child');
-          if (presetColors) {
-            presetColors.style.position = 'absolute';
-            presetColors.style.top = '0';
-            presetColors.style.left = '100%';
-            presetColors.style.transform = 'rotate(90deg) translateX(150px) translateY(63.5px)';
-            presetColors.style.width = '185px';
-            presetColors.style.border = '1px solid #d9d9d9';
-            presetColors.style.borderRadius = '5px';
-            presetColors.style.paddingLeft = '15px';
-          }
-        }, []);
-        //48 
-      
-        // Define the preset colors with one color removed
-        const presetColors = [
-          '#000000', '#00FF00', '#F8E71C', '#8B572A', '#7ED321', '#417505', '#BD10E0',
-          '#FFFFFF', '#FF0000', '#0000FF', '#B8E900', '#FF00FF', '#4A4A4A', '#9B9B9B'
-        ];
-      
-        return (
-          <div className="sketchpicker-container">
-            {/* Always render the SketchPicker */}
-            <SketchPicker
-              color={color}
-              onChangeComplete={handleChangeComplete}
-              className="sketch-picker" // Add custom class
-              presetColors={presetColors} // Set the preset colors
-            />
-          </div>
-        );
-      };
 
       function ThemeDrop() {
         const [showMenu, setShowMenu] = useState(false);
@@ -497,5 +499,6 @@ function Hub() {
         </div>
     );
 
-}
+    }
+
 export default Hub;

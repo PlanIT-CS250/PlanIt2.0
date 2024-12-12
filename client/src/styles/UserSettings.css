@@ -4,4 +4,45 @@
     background-color: white;
     color: rgb(0, 0, 0);
     padding: 10px;
+
 }
+
+.editor-canvas {
+    border-radius: 0px;
+    position: absolute;
+    
+}
+
+canvas.editor-canvas {
+    width: 150px !important;
+    height: 125px !important;
+    padding: 10px;
+    top: 110px;
+}
+
+.uploadOver {
+    position: absolute;
+    top: 35%;
+    right: 0;
+    padding-right: 10px;
+    padding-top: 5px;
+    cursor: pointer;
+    align-items: right;
+}
+
+.uploadBtn {
+    position: relative;
+    display: inline-block;
+    left: 10%;
+}
+
+.editorContainer {
+    display: flex;
+    justify-content: center; /* Center horizontally */
+    align-items: center; /* Center vertically */
+    width: 100%; /* Ensure the container takes full width */
+    height: 100%; /* Ensure the container takes full height */
+    position: relative; 
+
+}
+

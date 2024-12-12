@@ -14,6 +14,7 @@ import PlanetSettings from './components/PlanetSettings.jsx';
 import './styles/PlanetSettings.css';
 import Logout from './components/Logout.jsx';
 import UserSettings from './components/UserSettings.jsx';
+import './styles/UserSettings.css';
 
 
 createRoot(document.getElementById('root')).render(
@@ -27,6 +28,7 @@ createRoot(document.getElementById('root')).render(
             <Route path="/hub" element={<Hub />} />
             <Route path="/planets/:planetId" element={<Planets />} />
             <Route path="/planets/:planetId/settings/" element={<PlanetSettings />} />
+            <Route path="/users/:userId/settings/" element={<UserSettings />} />
       </Routes>
     </Router>
   //</StrictMode>,

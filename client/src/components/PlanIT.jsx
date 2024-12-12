@@ -11,7 +11,7 @@ import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import '../styles/PlanIT.css';
 import axios from 'axios';
-import Modal from './Modal.jsx';
+
 
 function PlanIT() {
   // State for the columns on the board
