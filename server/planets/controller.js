@@ -502,6 +502,7 @@ async function updateTask(req, res)
     try
     {
         const { taskId } = req.params; // /planets/tasks/___ <-
+        console.log(req.body);
         const passedFields = Object.keys(req.body);
         const validFields = Object.keys(PlanetTask.schema.paths);
         const filteredFields = passedFields.filter(field => validFields.includes(field));
@@ -610,6 +611,8 @@ async function updateTask(req, res)
                                 task.order = newOrder;
                             }
                         }
+                        task.priority = req.body.priority;
+                        task.description = req.body.description;
                             //Attempt to save task
                             try {
                                 await task.save();

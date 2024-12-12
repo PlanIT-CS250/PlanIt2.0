@@ -11,7 +11,7 @@ import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
 import '../styles/PlanIT.css';
 import axios from 'axios';
-
+import Modal from 'react-modal';
 
 function PlanIT() {
   // State for the columns on the board
@@ -22,9 +22,10 @@ function PlanIT() {
   const [user, setUser] = useState();
   const [planet, setPlanet] = useState();
   const [planetCollaborators, setPlanetCollaborators] = useState();
-  const [tables, setTables] = useState([]);
   const { planetId } = useParams(); //Id passed in url parameters
   const navigate = useNavigate();
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedCard, setSelectedCard] = useState(null);
 
   //Grab token from local storage
   useEffect(() => {
@@ -379,15 +380,33 @@ const handleDragEnd = (event) => {
 };
 
   //Edits the content of a card
-  const editCardContent = (columnId, taskId) => {
-    const updatedContent = prompt("Edit task content:");
-    if (updatedContent.length >= 1 && updatedContent.length <= 30) {
-      updateTask(taskId, { content: updatedContent });
-    }
-    else {
-      alert("Task content must be between 1 and 30 characters");
-    }
-  };
+// const editCardContent = (columnId, taskId) => {
+//     const updatedContent = prompt("Edit task content:");
+//     if (updatedContent.length >= 1 && updatedContent.length <= 30) {
+//       updateTask(taskId, { content: updatedContent });
+//     }
+//     else {
+//       alert("Task content must be between 1 and 30 characters");
+//     }
+// };
+
+  // Function to open the modal
+const openModal = (card) => {
+  setSelectedCard(card);
+  setIsModalOpen(true);
+};
+
+// Function to close the modal
+const closeModal = () => {
+  setIsModalOpen(false);
+  setSelectedCard(null);
+};
+
+// Function to handle card updates
+const handleCardUpdate = (updatedDetails) => {
+  updateTask(selectedCard.id, updatedDetails);
+  closeModal();
+};
 
   // The PlanIT page
   return (
@@ -439,12 +458,18 @@ const handleDragEnd = (event) => {
               id={column.id}
               name={column.name}
               items={column.tasks}
-              createTask={promptCreateTask}
-              editCardContent={editCardContent}
-            />
+              createTask={createTask}
+              editCardContent={(id, taskId) => openModal({ id: taskId, content: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).content })}
+              />
           ))}
         </div>
       </DndContext>
+      <CardModal
+        isOpen={isModalOpen}
+        onRequestClose={closeModal}
+        card={selectedCard}
+        updateTask={updateTask}
+      />
     </div>
   );
 }
@@ -476,19 +501,79 @@ function Column({ id, name, items, createTask, editCardContent }) {
   );
 }
 
+function CardModal({ isOpen, onRequestClose, card, updateTask }) {
+  const [content, setContent] = useState(card ? card.content : '');
+  const [description, setDescription] = useState(card ? card.description : '');
+  const [priority, setPriority] = useState(card ? card.priority : 1);
+
+  useEffect(() => {
+    if (card) {
+      setContent(card.content);
+      setDescription(card.description || '');
+      setPriority(card.priority || 1);
+    }
+  }, [card]);
+
+  const handleSave = () => {
+    if (content.length >= 1 && content.length <= 30) {
+      if (description.length >= 1 && description.length <= 500) {
+        updateTask(card.id, { content, description, priority });
+        onRequestClose();
+      } else {
+        alert("Task description must be between 1 and 500 characters.");
+      }
+    } else {
+      alert("Task content must be between 1 and 30 characters");
+    }
+  };
+
+  return (
+    <Modal
+      isOpen={isOpen}
+      onRequestClose={onRequestClose}
+      className="custom-modal-content"
+      overlayClassName="custom-modal-overlay"
+    >
+      <textarea 
+        className="title-content" 
+        value={content} 
+        onChange={(e) => setContent(e.target.value)}
+      />
+      <label className="description-label">Description</label>
+      <textarea 
+        value={description} 
+        onChange={(e) => setDescription(e.target.value)} 
+      />
+      <label className="priority-label">Priority</label>
+      <select value={priority} onChange={(e) => setPriority(e.target.value)}>
+        <option value="1">1 - Low</option>
+        <option value="2">2 - Medium</option>
+        <option value="3">3 - High</option>
+        <option value="4">4 - Critical</option>
+      </select>
+      <div>
+        <button className="save-button" onClick={handleSave}>Save</button>
+        <button className="cancel-button" onClick={onRequestClose}>Cancel</button>
+      </div>
+    </Modal>
+  );
+}
+
 // Draggable card component
 function DraggableCard({ id, content, onDoubleClick }) {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id });
 
 
+  // Style the card movement
   const style = {
     transform: CSS.Transform.toString(transform), // Safe transform values
     transition, // Smooth transitions
     zIndex: isDragging ? 1000 : 1, // Bring the dragged card to the top
-    boxShadow: isDragging ? '0 4px 12px rgba(0, 0, 0, 0.3)' : 'none',
+    boxShadow: isDragging ? '0 4px 12px rgba(0, 0, 0, 0.3)' : 'none',   
   };
 
   return (
+    //
     <div
       ref={setNodeRef}
       style={style}

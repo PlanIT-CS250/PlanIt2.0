@@ -18,6 +18,25 @@ const planetTaskSchema = new mongoose.Schema({
             message: "Task content must be between 1 and 30 characters."
         }
     },
+    description: {
+        type: String,
+        required: false,
+        validate: {
+            validator: v => v.length > 1 && v.length < 500,
+            message: "Task description must be between 1 and 500 characters."
+        }
+    },
+    priority: {
+        type: Number,
+        required: false,
+        validate: {
+            validator: v => {
+                validNums = [1, 2, 3, 4];
+                return validNums.includes(v);
+            },
+            message: "Priority must be an integer 1 through 4."
+        }
+    },
     order: {
         type: Number,
         required: false,
