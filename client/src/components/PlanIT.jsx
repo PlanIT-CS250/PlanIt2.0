@@ -316,7 +316,7 @@ const handleDragEnd = (event) => {
   // Find the destination column
   const destinationColumn = columns.find((column) =>
     column.tasks.some((task) => task.id === over.id)
-  );
+  ) || columns.find((column) => column.id === over.id);
 
   if (!sourceColumn || !destinationColumn) return; // Exit if either column is not found
 
@@ -491,6 +491,9 @@ function Column({ id, name, items, createTask, editCardContent }) {
               onDoubleClick={() => editCardContent(id, item.id)}
             />
           ))}
+          {items.length === 0 && (
+            <div className="empty-column">No tasks here yet</div>
+          )}
         </div>
       </SortableContext>
       <button className="add-card-button" onClick={() => createTask(id)}>
