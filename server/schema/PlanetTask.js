@@ -27,11 +27,11 @@ const planetTaskSchema = new mongoose.Schema({
         }
     },
     priority: {
-        type: Number,
+        type: String,
         required: false,
         validate: {
             validator: v => {
-                validNums = [1, 2, 3, 4];
+                validNums = ["1", "2", "3", "4"];
                 return validNums.includes(v);
             },
             message: "Priority must be an integer 1 through 4."

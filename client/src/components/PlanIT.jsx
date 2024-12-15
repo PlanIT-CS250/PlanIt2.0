@@ -13,6 +13,8 @@ import '../styles/PlanIT.css';
 import axios from 'axios';
 import Modal from 'react-modal';
 
+Modal.setAppElement('#root');
+
 function PlanIT() {
   // State for the columns on the board
   const [columns, setColumns] = useState([]);
@@ -28,7 +30,7 @@ function PlanIT() {
   const [selectedCard, setSelectedCard] = useState(null);
 
   //Grab token from local storage
-  useEffect(() => {
+useEffect(() => {
     try {
         //If token not found, navigate to hub
         if (!localStorage.getItem('token'))
@@ -40,7 +42,7 @@ function PlanIT() {
     catch {
       navigate('/hub'); 
     }
-  }, []);
+}, []);
 
 //Decode user id from token
 useEffect(() => {
@@ -123,6 +125,7 @@ useEffect(() => {
   }
 }, [user]);
 
+//Fetch planet collaborators
 const fetchColumns = async () => {
   let res = null;
   try {
@@ -164,6 +167,11 @@ const fetchColumns = async () => {
         const taskObj = {};
         taskObj.id = planetTask._id;
         taskObj.content = planetTask.content;
+        taskObj.description = planetTask.description;
+        taskObj.priority = planetTask.priority;
+        taskObj.assignedUser = planetTask.assignedUserId;
+        taskObj.createdAt = planetTask.createdAt;
+        taskObj.updatedAt = planetTask.updatedAt;
         tasks.push(taskObj); //Push task to list of tasks in column
       });
       //Push column to list of columns
@@ -190,111 +198,95 @@ useEffect(() => {
 }, [planet]);
 
 //Saves a new column to database
-async function createColumn(name)
-{
-  try 
-  {
-    const res = await axios.post(`http://localhost:3000/planets/${planet._id}/columns`, 
-      {
-          name
-      },
-      {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      }
-    );
-  } 
-  catch (error)
-  {
-    if (error.response) {
-      //Server returned 4xx or 5xx status code
-      alert(error.response.data.message);
-      console.error(error.response.data);
-      console.error(error.response.status);
-      console.error(error.response.headers);
-    } else if (error.request) {
-      //Request was made but recieved no response from server
-      alert("Internal server error. Contact support or try again later.")
-      console.error(error.request);
-    } else {
-      //Request was set up incorrectly
-      alert("There was an error creating a new column. Please try again later.");
-      console.error(error.message);
-    }
-  }
+async function createColumn() {
 
-}
-
-//Prompt the user for a column name, then saves the new column to database
-async function promptCreateColumn()
-{
   const name = prompt("Enter column name:");
-  if (name.length < 1 || name.length > 15)
-  {
+  if (name.length < 1 || name.length > 15) {
     alert("Column name must be between 1 and 15 characters.");
     return;
   }
-  
-  await createColumn(name);
-  await fetchColumns();
+  try {
+    const res = await axios.post(`http://localhost:3000/planets/${planet._id}/columns`, 
+      {
+        name
+      },
+      {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      }
+    );
+    await fetchColumns(); // Refresh columns after creation
+  } 
+  catch (error) {
+    alert("There was an error creating a new column. Please try again later.");
+    console.error(error);
+  }
 }
 
-//Saves a new task to database
+// Create a new task
 async function createTask(columnId, content)
 {
   try 
   {
-    const res = await axios.post(`http://localhost:3000/planets/columns/${columnId}/task`, 
-      {
-        columnId,
-        content
-      },
-      {
-          headers: {
-              'Authorization': `Bearer ${token}`
-          }
-      }
-    );
+    const newCardContent = prompt("Enter new card content:");
+    if (newCardContent && newCardContent.length <= 30 && newCardContent.length >= 1)
+    {
+      const res = await axios.post(`http://localhost:3000/planets/columns/${columnId}/task`, 
+        {
+          columnId,
+          content: newCardContent
+        },
+        {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        }
+      );
+      fetchColumns();
+    }
+    else {
+      alert("Task content must be between 1 and 30 characters.");
+    }
   }
   catch (error)
   {
+    alert("There was an error creating a new task. Please try again later.");
+    console.error(error);
+  } 
+}
+
+// Delete task
+async function deleteTask(taskId) {
+  try {
+    await axios.delete(`http://localhost:3000/planets/tasks/${taskId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    fetchColumns(); // Refresh columns after deletion
+  } catch (error) {
     if (error.response) {
-      //Server returned 4xx or 5xx status code
       alert(error.response.data.message);
       console.error(error.response.data);
       console.error(error.response.status);
       console.error(error.response.headers);
     } else if (error.request) {
-      //Request was made but recieved no response from server
-      alert("Internal server error. Contact support or try again later.")
+      alert("Internal server error. Contact support or try again later.");
       console.error(error.request);
     } else {
-      //Request was set up incorrectly
-      alert("There was an error creating a new task. Please try again later.");
+      alert("There was an error deleting the task. Please try again later.");
       console.error(error.message);
     }
-  } 
+  }
 }
 
-//Prompts a user for task content, then saves the new task to database
-async function promptCreateTask(columnId)
-{
-    const content = prompt("Enter new card content:");
-    if (content?.length <= 30 && content?.length >= 1)
-    {
-      await createTask(columnId, content);
-      await fetchColumns();
-    }
-    else {
-      alert("Task content must be between 1 and 30 characters.");
-    }
-}
-
+// Update task
 async function updateTask(taskId, changes)
 {
   try
   {
+    console.log('Updating task', taskId, changes);
     const res = await axios.put(`http://localhost:3000/planets/tasks/${taskId}`, changes,
     {
       headers: {
@@ -310,15 +302,18 @@ async function updateTask(taskId, changes)
   }
 }
   
+// Function to handle drag and drop
 const handleDragEnd = (event) => {
   const { active, over } = event;
 
   if (!over || active.id === over.id) return; // Exit if no drop target or no change
 
+  // Find the source and destination columns
   const sourceColumn = columns.find((column) =>
     column.tasks.some((task) => task.id === active.id)
   );
 
+  // Find the destination column
   const destinationColumn = columns.find((column) =>
     column.tasks.some((task) => task.id === over.id)
   );
@@ -330,6 +325,7 @@ const handleDragEnd = (event) => {
   if (sourceColumn.id === destinationColumn.id) {
     const columnIndex = columns.findIndex((column) => column.id === sourceColumn.id);
 
+    // Reorder tasks within the same column
     const updatedTasks = arrayMove(
       sourceColumn.tasks,
       sourceColumn.tasks.findIndex((task) => task.id === active.id),
@@ -355,12 +351,14 @@ const handleDragEnd = (event) => {
   const sourceColumnIndex = columns.findIndex((column) => column.id === sourceColumn.id);
   const destinationColumnIndex = columns.findIndex((column) => column.id === destinationColumn.id);
 
+  // Remove task from source column and insert into destination column
   const sourceTasks = [...sourceColumn.tasks];
   const [movedTask] = sourceTasks.splice(
     sourceTasks.findIndex((task) => task.id === active.id),
     1
   );
 
+  // Insert moved task into destination column
   const destinationTasks = [...destinationColumn.tasks];
   destinationTasks.splice(
     destinationTasks.findIndex((task) => task.id === over.id),
@@ -379,17 +377,6 @@ const handleDragEnd = (event) => {
   updateTask(active.id, { order: destinationTasks.indexOf(movedTask) + 1, columnId: destinationColumn.id });
 };
 
-  //Edits the content of a card
-// const editCardContent = (columnId, taskId) => {
-//     const updatedContent = prompt("Edit task content:");
-//     if (updatedContent.length >= 1 && updatedContent.length <= 30) {
-//       updateTask(taskId, { content: updatedContent });
-//     }
-//     else {
-//       alert("Task content must be between 1 and 30 characters");
-//     }
-// };
-
   // Function to open the modal
 const openModal = (card) => {
   setSelectedCard(card);
@@ -403,10 +390,10 @@ const closeModal = () => {
 };
 
 // Function to handle card updates
-const handleCardUpdate = (updatedDetails) => {
-  updateTask(selectedCard.id, updatedDetails);
-  closeModal();
-};
+// const handleCardUpdate = (updatedDetails) => {
+//   updateTask(selectedCard.id, updatedDetails);
+//   closeModal();
+// };
 
   // The PlanIT page
   return (
@@ -448,7 +435,7 @@ const handleCardUpdate = (updatedDetails) => {
           </div>
         </div>
       </div>
-      <button onClick={() => promptCreateColumn()}>Add column</button>
+      <button onClick={() => createColumn()}>Add column</button>
       {/* Board */}
       <DndContext onDragEnd={handleDragEnd}>
         <div className="board">
@@ -459,7 +446,14 @@ const handleCardUpdate = (updatedDetails) => {
               name={column.name}
               items={column.tasks}
               createTask={createTask}
-              editCardContent={(id, taskId) => openModal({ id: taskId, content: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).content })}
+              editCardContent={(id, taskId) => openModal({
+                 id: taskId, content: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).content,
+                 id: taskId, description: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).description,
+                 id: taskId, priority: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).priority,
+                 id: taskId, assignedUser: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).assignedUser,
+                 id: taskId, createdAt: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).createdAt,
+                 id: taskId, updatedAt: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).updatedAt
+                })}
               />
           ))}
         </div>
@@ -469,6 +463,8 @@ const handleCardUpdate = (updatedDetails) => {
         onRequestClose={closeModal}
         card={selectedCard}
         updateTask={updateTask}
+        deleteTask={deleteTask} // Pass deleteTask as a prop
+        collaborators={planetCollaborators || []}
       />
     </div>
   );
@@ -477,7 +473,6 @@ const handleCardUpdate = (updatedDetails) => {
 // Column component
 function Column({ id, name, items, createTask, editCardContent }) {
   const { setNodeRef } = useDroppable({ id });
-
   return (
     <div ref={setNodeRef} className="column">
       <h3>{name}</h3>
@@ -488,12 +483,16 @@ function Column({ id, name, items, createTask, editCardContent }) {
               key={item.id}
               id={item.id}
               content={item.content}
+              description={item.description}
+              priority={item.priority}
+              assignedUser={item.assignedUser}
+              createdAt={item.createdAt}
+              updatedAt={item.updatedAt}
               onDoubleClick={() => editCardContent(id, item.id)}
             />
           ))}
         </div>
       </SortableContext>
-
       <button className="add-card-button" onClick={() => createTask(id)}>
         + Add Card
       </button>
@@ -501,23 +500,33 @@ function Column({ id, name, items, createTask, editCardContent }) {
   );
 }
 
-function CardModal({ isOpen, onRequestClose, card, updateTask }) {
+// Card modal component
+function CardModal({ isOpen, onRequestClose, card, updateTask, deleteTask, collaborators }) {
   const [content, setContent] = useState(card ? card.content : '');
   const [description, setDescription] = useState(card ? card.description : '');
-  const [priority, setPriority] = useState(card ? card.priority : 1);
+  const [priority, setPriority] = useState(card ? card.priority : '1');
+  const [assignedUser, setAssignedUser] = useState(card ? card.assignedUser : '');
+  const [createdAt, setCreatedAt] = useState('');
+  const [updatedAt, setUpdatedAt] = useState('');
 
+
+  // Update the state when the card prop changes
   useEffect(() => {
     if (card) {
       setContent(card.content);
       setDescription(card.description || '');
-      setPriority(card.priority || 1);
+      setPriority(card.priority || '1');
+      setAssignedUser(card.assignedUser || '');
+      setCreatedAt(card.createdAt ? new Date(card.createdAt).toLocaleString() : '');
+      setUpdatedAt(card.updatedAt ? new Date(card.updatedAt).toLocaleString() : '');
     }
   }, [card]);
 
+  // Function to handle saving the card
   const handleSave = () => {
     if (content.length >= 1 && content.length <= 30) {
       if (description.length >= 1 && description.length <= 500) {
-        updateTask(card.id, { content, description, priority });
+        updateTask(card.id, { content, description, priority, assignedUser });
         onRequestClose();
       } else {
         alert("Task description must be between 1 and 500 characters.");
@@ -525,6 +534,13 @@ function CardModal({ isOpen, onRequestClose, card, updateTask }) {
     } else {
       alert("Task content must be between 1 and 30 characters");
     }
+    console.log('After save - Updated at:', updatedAt);
+  };
+
+  // Function to handle deleting the card
+  const handleDelete = () => {
+    deleteTask(card.id);
+    onRequestClose();
   };
 
   return (
@@ -543,6 +559,7 @@ function CardModal({ isOpen, onRequestClose, card, updateTask }) {
       <textarea 
         value={description} 
         onChange={(e) => setDescription(e.target.value)} 
+        placeholder="Enter a description for this task"
       />
       <label className="priority-label">Priority</label>
       <select value={priority} onChange={(e) => setPriority(e.target.value)}>
@@ -551,9 +568,25 @@ function CardModal({ isOpen, onRequestClose, card, updateTask }) {
         <option value="3">3 - High</option>
         <option value="4">4 - Critical</option>
       </select>
-      <div>
-        <button className="save-button" onClick={handleSave}>Save</button>
-        <button className="cancel-button" onClick={onRequestClose}>Cancel</button>
+      <label className="assigned-user-label">Assigned User</label>
+      <select className="assigned-user-select" value={assignedUser} onChange={(e) => setAssignedUser(e.target.value)}>
+        <option value="">No Assigned User</option>
+        {collaborators.map(collaborator => (
+          <option key={collaborator._id} value={collaborator._id}>
+            {collaborator.username}
+          </option>
+        ))}
+      </select>
+      <div className="modal-footer">
+        <div className="buttons">
+          <button className="save-button" onClick={handleSave}>Save</button>
+          <button className="cancel-button" onClick={onRequestClose}>Cancel</button>
+          <button className="delete-button" onClick={handleDelete}>Delete</button>
+        </div>
+        <div className="timestamps">
+          <p>Created At: {createdAt}</p>
+          <p>Updated At: {updatedAt}</p>
+        </div>
       </div>
     </Modal>
   );
@@ -573,7 +606,7 @@ function DraggableCard({ id, content, onDoubleClick }) {
   };
 
   return (
-    //
+    // Card element
     <div
       ref={setNodeRef}
       style={style}
