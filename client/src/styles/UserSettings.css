@@ -7,12 +7,6 @@
 
 }
 
-.editor-canvas {
-    border-radius: 0px;
-    position: absolute;
-    
-}
-
 canvas.editor-canvas {
     width: 150px !important;
     height: 125px !important;
@@ -44,5 +38,9 @@ canvas.editor-canvas {
     height: 100%; /* Ensure the container takes full height */
     position: relative; 
 
+}
+
+.Submit {
+    margin-top: 10px;
 }
 

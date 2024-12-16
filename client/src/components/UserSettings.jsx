@@ -145,7 +145,17 @@ function UserSettings() {
     return (
         <div className="uSettingsContainer">
             <h1>User Settings</h1>
+            <div className='NameAndPassword'>
+                <h2>Change Username</h2>
+                <input type="text" placeholder="Enter new username" />
+                <button className='Submit'>Submit</button>
+                <h2>Change Password</h2>
+                <input type="text" placeholder="Enter new password" />
+                <button className='Submit'>Submit</button>
+            </div>
+            <div>
             <UploadImage />
+            </div>
         </div>
     );
 }

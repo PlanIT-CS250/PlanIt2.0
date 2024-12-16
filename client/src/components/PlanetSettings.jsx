@@ -10,7 +10,7 @@ function PlanetSettings() {
     const [userId, setUserId] = useState();
     const [user, setUser] = useState();
     const [planet, setPlanet] = useState({ name: '', description: ''});
-    const [planetCollaborators, setPlanetCollaborators] = useState();
+    const [planetCollaborators, setPlanetCollaborators] = useState([]);
     const navigate = useNavigate();
 
     //Grab token from local storage
@@ -110,25 +110,89 @@ useEffect(() => {
 }, [user]);
 
 
-    return (
-        <div className="pSettingsContainer">
-            <h1>Planet Settings</h1>
-            <div className="nameDescription">  
-                <h2>{planet.name}</h2>
-                <input 
-                type="text" 
-                placeholder="Planet Name"
-                />
-                <h2>{planet.description}</h2>
-                <input 
-                type="text" 
-                placeholder="Planet Description" />
-            </div>
-            <div className="deleteButton">
-              <button>Delete Project</button>
-            </div>
-        </div>
-    )
+
+
+return (
+  <div className="pSettingsContainer">
+    {/*left side content*/}
+    <div className="leftSide">
+      <h1>Planet Settings</h1>
+      <div className="nameDescription">
+        <h2>{planet.name}</h2>
+        <input 
+          type="text" 
+          placeholder="Planet Name"
+        />
+        <button className="submit" >Submit</button>
+        <h2>{planet.description}</h2>
+        <input 
+          type="text" 
+          placeholder="Planet Description"
+        />
+        <button className="submit" >Submit</button>
+      </div>
+
+      <div className="collaborators">
+        <h2>Collaborators</h2>
+        <ul className="collabName">
+          {/*displays all collaborators*/}
+          {planetCollaborators.map(collaborator => (
+            <li key={collaborator._id}>{collaborator.username}
+            <span className="remove-message">Click to remove as collaborator</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </div>
+    {/*line down the middle*/}
+    <div className="center"></div>
+    {/*right side content*/}
+    <div className="rightSide">
+      <div className="customization">
+        <h1>Customize Planet</h1>
+        <h2></h2>
+        <h2>
+          Color:  {planet.color}
+          {/* preview of the color and an input to change the color, styled so they are ontop of each other */}
+          <div 
+        className="preview"
+        style={{
+          display: 'inline-block',
+          width: '20px',
+          height: '20px',
+          backgroundColor: planet.color,
+          marginLeft: '10px',
+          position: 'relative',
+          top: '3px',
+          border: '1px solid #000'
+        }}
+      />
+      <input
+        type="color"
+        value={planet.color}
+        style={{
+          display: 'inline-block',
+          width: '20px',
+          height: '20px',
+          marginLeft: '-21px',
+          position: 'relative',
+          bottom: '7px',
+          background: 'none'
+        }}
+      />
+
+        </h2>
+
+        <h2/>
+
+      </div>
+
+      <div className="deleteButton">
+        <button>Delete Project</button>
+      </div>
+    </div>
+  </div>
+);
 
 }
 export default PlanetSettings;

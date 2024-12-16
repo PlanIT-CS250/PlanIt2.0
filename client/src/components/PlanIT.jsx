@@ -432,13 +432,13 @@ const handleCardUpdate = (updatedDetails) => {
             {isDropdownOpen && (
               <div className="profile-dropdown">
                 <div className="profile-header">
-                  <span className="profile-name">Benjamin Green</span>
-                  <span className="profile-email">benjamin.green5@snhu.edu</span>
+                  <span className="profile-name">{user.fName} {user.lName}</span>
+                  <span className="profile-email">{user.email}</span>
                 </div>
                 <div className="profile-options">
                   <NavLink to="/quickstart">Open Quickstart</NavLink>
                   <NavLink to="/profile">Profile</NavLink>
-                  <NavLink to="/personal-settings">Personal settings</NavLink>
+                  <NavLink to={`/users/${userId}/settings`}>Personal settings</NavLink>
                   <NavLink to="/notifications">Notifications</NavLink>
                   <NavLink to="/theme">Theme</NavLink>
                   <NavLink to="/logout">Log out</NavLink>
