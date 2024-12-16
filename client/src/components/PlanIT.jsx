@@ -190,7 +190,7 @@ const fetchColumns = async () => {
         taskObj.content = planetTask.content;
         taskObj.description = planetTask.description;
         taskObj.priority = planetTask.priority;
-        taskObj.assignedUser = planetTask.assignedUserId;
+        taskObj.assignedUserId = planetTask.assignedUserId;
         taskObj.createdAt = planetTask.createdAt;
         taskObj.updatedAt = planetTask.updatedAt;
         tasks.push(taskObj); //Push task to list of tasks in column
@@ -479,7 +479,7 @@ const closeMailbox = () => {
                  id: taskId, content: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).content,
                  id: taskId, description: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).description,
                  id: taskId, priority: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).priority,
-                 id: taskId, assignedUser: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).assignedUser,
+                 id: taskId, assignedUserId: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).assignedUserId,
                  id: taskId, createdAt: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).createdAt,
                  id: taskId, updatedAt: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).updatedAt
                 })}
@@ -536,7 +536,7 @@ function Column({ id, name, items, createTask, editCardContent }) {
               content={item.content}
               description={item.description}
               priority={item.priority}
-              assignedUser={item.assignedUser}
+              assignedUserId={item.assignedUserId}
               createdAt={item.createdAt}
               updatedAt={item.updatedAt}
               onDoubleClick={() => editCardContent(id, item.id)}
@@ -560,7 +560,7 @@ function CardModal({ isOpen, onRequestClose, card, updateTask, deleteTask, colla
   const [content, setContent] = useState(card ? card.content : '');
   const [description, setDescription] = useState(card ? card.description : '');
   const [priority, setPriority] = useState(card ? card.priority : '1');
-  const [assignedUser, setAssignedUser] = useState(card ? card.assignedUser : '');
+  const [assignedUserId, setassignedUserId] = useState(card ? card.assignedUserId : '');
   const [createdAt, setCreatedAt] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
 
@@ -571,7 +571,7 @@ function CardModal({ isOpen, onRequestClose, card, updateTask, deleteTask, colla
       setContent(card.content);
       setDescription(card.description || '');
       setPriority(card.priority || '1');
-      setAssignedUser(card.assignedUser || '');
+      setassignedUserId(card.assignedUserId || '');
       setCreatedAt(card.createdAt ? new Date(card.createdAt).toLocaleString() : '');
       setUpdatedAt(card.updatedAt ? new Date(card.updatedAt).toLocaleString() : '');
     }
@@ -581,7 +581,7 @@ function CardModal({ isOpen, onRequestClose, card, updateTask, deleteTask, colla
   const handleSave = () => {
     if (content.length >= 1 && content.length <= 30) {
       if (description.length >= 1 && description.length <= 500) {
-        updateTask(card.id, { content, description, priority, assignedUser });
+        updateTask(card.id, { content, description, priority, assignedUserId });
         onRequestClose();
       } else {
         alert("Task description must be between 1 and 500 characters.");
@@ -624,7 +624,7 @@ function CardModal({ isOpen, onRequestClose, card, updateTask, deleteTask, colla
         <option value="4">4 - Critical</option>
       </select>
       <label className="assigned-user-label">Assigned User</label>
-      <select className="assigned-user-select" value={assignedUser} onChange={(e) => setAssignedUser(e.target.value)}>
+      <select className="assigned-user-select" value={assignedUserId} onChange={(e) => setassignedUserId(e.target.value)}>
         <option value="">No Assigned User</option>
         {collaborators.map(collaborator => (
           <option key={collaborator._id} value={collaborator._id}>
