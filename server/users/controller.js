@@ -323,9 +323,9 @@ async function updateUser(req, res)
                 {
                     //Hash new password
                     const salt = await bcrypt.genSalt(saltRounds);
-                    const hash = await bcrypt.hash(password, salt);
+                    const hash = await bcrypt.hash(req.body.password, salt);
                     user.password = hash;
-                    filteredFields.splice(filterdFields.indexOf("password"), 1); //Remove password field
+                    filteredFields.splice(filteredFields.indexOf("password"), 1); //Remove password field
                 }
 
                 filteredFields.forEach(field => {
@@ -369,7 +369,7 @@ async function updateUser(req, res)
         });
     } 
     catch (error) {
-        console.error(error.message);
+        console.error(error);
         res.status(500).json({ 
             message: "Server error. Contact support or try again later." 
         }); 
