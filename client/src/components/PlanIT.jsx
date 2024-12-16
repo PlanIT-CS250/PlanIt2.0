@@ -399,7 +399,7 @@ const closeModal = () => {
   return (
     <div className="planit-page">
       {/* Navbar */}
-      <div className="hub-nav-top" style={{backgroundColor: planet?.theme?.[1] || '#FFFFFF' }}>
+      <div className="hub-nav-top">
         <div className="hub-nav-left">
           <NavLink to="/home" className="home">
             <img src={logoImage} alt="Logo" className="logo-image" />
@@ -435,10 +435,10 @@ const closeModal = () => {
           </div>
         </div>
       </div>
-      <button style={{backgroundColor: planet?.theme?.[4] || '#FFFFFF'}} onClick={() => createColumn()}>Add column</button>
+      <button onClick={() => createColumn()}>Add column</button>
       {/* Board */}
       <DndContext onDragEnd={handleDragEnd}>
-        <div className="board" style={{backgroundColor: planet?.theme?.[0] || '#FFFFFF' }}>
+        <div className="board">
           {columns.map((column) => ( 
             <Column
               key={column.id}
@@ -474,10 +474,10 @@ const closeModal = () => {
 function Column({ id, name, items, createTask, editCardContent }) {
   const { setNodeRef } = useDroppable({ id });
   return (
-    <div ref={setNodeRef} className="column" >
+    <div ref={setNodeRef} className="column">
       <h3>{name}</h3>
       <SortableContext items={items.map((item) => item.id)} strategy={verticalListSortingStrategy}>
-        <div className="cards-container" >
+        <div className="cards-container">
           {items.map((item) => (
             <DraggableCard
               key={item.id}

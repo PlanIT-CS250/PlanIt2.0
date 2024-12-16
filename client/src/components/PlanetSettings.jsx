@@ -123,6 +123,7 @@ return (
           type="text" 
           placeholder="Planet Name"
         />
+        <button className="submit" >Submit</button>
         <h2>{planet.description}</h2>
         <input 
           type="text" 
@@ -135,15 +136,11 @@ return (
         <h2>Collaborators</h2>
         <ul className="collabName">
           {/*displays all collaborators*/}
-          {planetCollaborators
-            .filter(collaborator => collaborator.role !== 'owner')
-            .map(collaborator => (
-              <li key={collaborator._id}>
-                {collaborator.username}
-                <button className="promoteButton">Promote</button>
-                <button className="kickButton">Kick</button>
-              </li>
-            ))}
+          {planetCollaborators.map(collaborator => (
+            <li key={collaborator._id}>{collaborator.username}
+            <span className="remove-message">Click to remove as collaborator</span>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
@@ -152,39 +149,42 @@ return (
     {/*right side content*/}
     <div className="rightSide">
       <div className="customization">
+        <h1>Customize Planet</h1>
         <h2></h2>
         <h2>
           Color:  {planet.color}
           {/* preview of the color and an input to change the color, styled so they are ontop of each other */}
           <div 
-        
+        className="preview"
+        style={{
+          display: 'inline-block',
+          width: '20px',
+          height: '20px',
+          backgroundColor: planet.color,
+          marginLeft: '10px',
+          position: 'relative',
+          top: '3px',
+          border: '1px solid #000'
+        }}
       />
       <input
         type="color"
         value={planet.color}
         style={{
           display: 'inline-block',
-          width: '30px',
-          height: '40 px',
-          marginLeft: '150px',
+          width: '20px',
+          height: '20px',
+          marginLeft: '-21px',
           position: 'relative',
-          bottom: '40px',
+          bottom: '7px',
           background: 'none'
         }}
       />
 
         </h2>
+
         <h2/>
 
-      </div>
-
-      <div className='invite'>
-        <h2>Invite Collaborators</h2>
-        <input 
-          type="text" 
-          placeholder="exampleEmail@gmail.com"
-        />
-        <button className="submit" >Submit</button>
       </div>
 
       <div className="deleteButton">
