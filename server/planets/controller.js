@@ -502,6 +502,7 @@ async function updateTask(req, res)
     try
     {
         const { taskId } = req.params; // /planets/tasks/___ <-
+        console.log(req.body);
         const passedFields = Object.keys(req.body);
         const validFields = Object.keys(PlanetTask.schema.paths);
         const filteredFields = passedFields.filter(field => validFields.includes(field));
@@ -523,7 +524,7 @@ async function updateTask(req, res)
                 if (planet)
                 {
                     //If id of token is a member of planet
-                    var planetUserMatch = await PlanetCollaborator.exists({ planetId: currColumn.planetId, userId: req.user.userId });
+                    const planetUserMatch = await PlanetCollaborator.exists({ planetId: currColumn.planetId, userId: req.user.userId });
                     if (planetUserMatch || req.user.role == "admin")
                     {
                         if (filteredFields.includes("content"))
@@ -532,32 +533,21 @@ async function updateTask(req, res)
                         }
                         if (filteredFields.includes("assignedUserId"))
                         {
-                            console.log(req.body.assignedUserId);
-                            if (req.body.assignedUserId == null) {
-                                task.assignedUserId = null;
-                            }
-                            else
+                            const assignedUser = await User.findById(req.body.assignedUserId);
+                            if (assignedUser)
                             {
-                                const assignedUser = await User.findById(req.body.assignedUserId);
-                                if (assignedUser)
+                                planetUserMatch = await PlanetCollaborator.exists({ planetId: planet._id, userId: assignedUser._id });
+                                if (planetUserMatch)
                                 {
-                                    planetUserMatch = await PlanetCollaborator.exists({ planetId: planet });
-                                    if (planetUserMatch)
-                                    {
-                                        task.assignedUserId = req.body.assignedUserId;
-                                    }
-                                    else {
-                                        return res.status(400).json({
-                                            message: "New assigned user does not have permission to work on this task."
-                                        });
-                                    }
+                                    task.assignedUserId = assignedUser._id;
                                 }
-                                else {
-                                    return res.status(404).json({
-                                        message: "New assigned user not found."
-                                    });
-                                }
-                                }
+                                return res.status(400).json({
+                                    message: "New assigned user does not have permission to work on this task."
+                                });
+                            }
+                            return res.status(404).json({
+                                message: "New assigned user not found."
+                            });
                         }
                         if (filteredFields.includes("order"))
                         {

@@ -1,10 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import axios from 'axios';
 import AvatarEditor from 'react-avatar-editor';
-import { useNavigate, useRouteLoaderData } from 'react-router-dom'; //To navigate to other pages in the app
-import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 
-const accessToken = "sl.CCto1bEmOW5z_t1jDoNjkLQdx3Tv72YrVud-CdfdLkDpnOwGSqywC1gCpSHbmthGiyJz6V_8XFrxDJaCdTG7Rb4mdsC7b-tLYMEXC5PkBo_IiEo_Se5-U6At2EKm0FKNohc4cYJa_lYb";
+const accessToken = "sl.CCci3gXmyVZumwbS0DBdl9Wc5a95VSz3oSwLzRll2jQJhrMJve1_M56EQwDxZoBLmHsrG4Un68EDecWtb9zCs5-pO7yYq4zx6s7aeOjUOzpzY87O0Qj5mIs3uBiF6iKws6RX4Exohuqc";
 
 // Submits an image (base64) to the dropbox folder
 async function submitImage(base64Image, fileName)
@@ -52,7 +50,7 @@ class UploadImage extends React.Component {
             borderRadius: 50,
             preview: null,
             width: 300,
-            height: 300
+            height: 300,
         };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -89,7 +87,14 @@ class UploadImage extends React.Component {
         if (this.editor) {
             const canvas = this.editor.getImageScaledToCanvas().toDataURL();
             this.setState({ preview: canvas });
-            this.props.setPfpLink(this.state.fileName); // Add this line inside handleSubmit
+
+            try {
+                // Make put request to localhost:3000/users/:userId
+            }
+            catch (error) {
+
+            }
+
             submitImage(this.state.image, this.state.fileName); // Run if request succeeds without error
         }
     };
@@ -137,159 +142,19 @@ class UploadImage extends React.Component {
 }
 
 function UserSettings() {
-    const [pfpLink, setPfpLink] = useState();
-    const [token, setToken] = useState();
-    const [userId, setUserId] = useState();
-    const [user, setUser] = useState({ username: "" });
-    const [username, setUsername] = useState(user.username);
-    const [password, setPassword] = useState();
-    const navigate = useNavigate();
-
-    const handlePfpLinkUpdate = (fileName) => {
-        setPfpLink(fileName);
-    };
-
-    const handleUserNameChange = (e) => {
-        setUsername(e.target.value);
-    }
-
-    const handlePasswordChange = (e) => {
-        setPassword(e.target.value);
-    }
-
-    //Grab token from local storage
-    useEffect(() => {
-        try {
-            if (!localStorage.getItem('token'))
-            {
-                navigate('/'); //Redirect to login
-            }
-            setToken(localStorage.getItem('token'));
-        }
-        catch {
-            navigate('/'); //Redirect to login
-        }
-    }, []);
-
-    //Decode user id from token
-    useEffect(() => {
-        if (token)
-        {
-            try {
-                var decoded = jwtDecode(token);
-                setUserId(decoded.userId);
-            } catch {
-                navigate('/'); //Navigate to login
-            }
-        }
-    }, [token]);
-
-    //Fetch user data
-    useEffect(() => {
-        const fetchUserData = async () => {
-            let res = null;
-            try {
-                res = await axios.get(`http://localhost:3000/users/${userId}`, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-            } catch (error) 
-            {
-                //Response and status code were returned from server
-                if (error.response?.status) 
-                {
-                    alert(error.response.data.message);
-                    console.error(error.response);
-                    navigate('/');
-                }
-                //Request succeeded but received no response
-                else if (!error.response && error.request)
-                {
-                    alert("There was an error retrieving user data. Contact support or try again later.");
-                    console.error(error.response);
-                    navigate('/');
-                }
-                //Client-side error in setting up the request
-                else 
-                {
-                    alert("Client error. Contact support or try again later.");
-                    console.error(error.message);
-                    navigate('/');
-                }
-            }
-            
-            if (res?.data?.user)
-            {
-                setUser(res.data.user);
-            }
-            else {
-                alert("There was an error retreiving user data. Contact support or try again later.");
-                navigate('/');
-            }
-        };
-        if (userId)
-        {
-            fetchUserData();
-        }
-    }, [userId]); // useEffect hooks runs when userId changes
-
-    async function savePfpLink(userId, link)
-    {
-        try
-        {
-            console.log('Updating user', userId, link);
-            const res = await axios.put(`http://localhost:3000/users/${userId}`, { pfpLink: link },
-            {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-            }
-            );
-        }
-        catch(error)
-        {
-            console.log(error);
-        }
-    }
-
-    useEffect(() => {
-        if (pfpLink) {
-            savePfpLink(userId, pfpLink);
-        }
-    }, [pfpLink]);
-
-    async function updateUser(userId, changes)
-    {
-        try
-        {
-            console.log('Updating user', userId, changes);
-            const res = await axios.put(`http://localhost:3000/users/${userId}`, changes,
-            {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-            }
-            );
-        }
-        catch(error)
-        {
-            console.log(error);
-        }
-    }
-
     return (
         <div className="uSettingsContainer">
             <h1>User Settings</h1>
             <div className='NameAndPassword'>
                 <h2>Change Username</h2>
-                <input onChange={handleUserNameChange} placeholder="Enter new username" />
+                <input type="text" placeholder="Enter new username" />
+                <button className='Submit'>Submit</button>
                 <h2>Change Password</h2>
-                <input onChange={handlePasswordChange} type="text" placeholder="Enter new password" />
-                <button onClick={() => updateUser(userId, { username, password })}>Submit</button>
+                <input type="text" placeholder="Enter new password" />
+                <button className='Submit'>Submit</button>
             </div>
             <div>
-            <UploadImage setPfpLink={handlePfpLinkUpdate} />
+            <UploadImage />
             </div>
         </div>
     );

@@ -31,7 +31,7 @@ function Hub() {
     const onClose = () => setOpenModal(false);
     const [pfp, setPfp] = useState('/');
     const dbx = new Dropbox({
-        accessToken: "sl.CCto1bEmOW5z_t1jDoNjkLQdx3Tv72YrVud-CdfdLkDpnOwGSqywC1gCpSHbmthGiyJz6V_8XFrxDJaCdTG7Rb4mdsC7b-tLYMEXC5PkBo_IiEo_Se5-U6At2EKm0FKNohc4cYJa_lYb",
+        accessToken: "sl.CCci3gXmyVZumwbS0DBdl9Wc5a95VSz3oSwLzRll2jQJhrMJve1_M56EQwDxZoBLmHsrG4Un68EDecWtb9zCs5-pO7yYq4zx6s7aeOjUOzpzY87O0Qj5mIs3uBiF6iKws6RX4Exohuqc",
         fetch: fetch.bind(window)
     });
 
