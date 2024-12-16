@@ -412,9 +412,9 @@ function Hub() {
         };
 
         const themes = {
-            'Theme 1': ['#FF5733', '#33FF57', '#3357FF', '#F3FF33', '#FF33F3'],
-            'Theme 2': ['#FF3333', '#33FF33', '#3333FF', '#FFFF33', '#FF33FF'],
-            'Theme 3': ['#5733FF', '#57FF33', '#FF3357', '#33F3FF', '#F333FF'],
+            'Theme 1': ['#3e204f', '#5a4565', '#cec9d6', '#e2dbe9', '#bcaecc'],
+            'Theme 2': ['#ffa2a2', '#9f917b', '#c5b88f', '#f9f0f0', '#aaaaaa'],
+            'Theme 3': ['#424853', '#ff7b7b', '#cccccc', '#bbbbbb', '#aaaaaa'],
             'None': []
         };
       

@@ -427,7 +427,7 @@ const closeMailbox = () => {
   return (
     <div className="planit-page">
       {/* Navbar */}
-      <div className="hub-nav-top">
+      <div className="hub-nav-top" style={{backgroundColor: planet?.theme?.[1] || '#FFFFFF' }}>
         <div className="hub-nav-left">
           <NavLink to="/home" className="home">
             <img src={logoImage} alt="Logo" className="logo-image" />
@@ -464,10 +464,10 @@ const closeMailbox = () => {
           </div>
         </div>
       </div>
-      <button onClick={() => createColumn()}>Add column</button>
+      <button style={{backgroundColor: planet?.theme?.[4] || '#FFFFFF'}} onClick={() => createColumn()}>Add column</button>
       {/* Board */}
       <DndContext onDragEnd={handleDragEnd}>
-        <div className="board">
+        <div className="board" style={{backgroundColor: planet?.theme?.[0] || '#FFFFFF' }}>
           {columns.map((column) => ( 
             <Column
               key={column.id}

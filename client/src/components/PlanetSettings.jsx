@@ -123,7 +123,6 @@ return (
           type="text" 
           placeholder="Planet Name"
         />
-        <button className="submit" >Submit</button>
         <h2>{planet.description}</h2>
         <input 
           type="text" 
@@ -136,11 +135,15 @@ return (
         <h2>Collaborators</h2>
         <ul className="collabName">
           {/*displays all collaborators*/}
-          {planetCollaborators.map(collaborator => (
-            <li key={collaborator._id}>{collaborator.username}
-            <span className="remove-message">Click to remove as collaborator</span>
-            </li>
-          ))}
+          {planetCollaborators
+            .filter(collaborator => collaborator.role !== 'owner')
+            .map(collaborator => (
+              <li key={collaborator._id}>
+                {collaborator.username}
+                <button className="promoteButton">Promote</button>
+                <button className="kickButton">Kick</button>
+              </li>
+            ))}
         </ul>
       </div>
     </div>
@@ -149,7 +152,6 @@ return (
     {/*right side content*/}
     <div className="rightSide">
       <div className="customization">
-        <h1>Customize Planet</h1>
         <h2></h2>
         <h2>
           Color:  {planet.color}
@@ -185,6 +187,15 @@ return (
 
         <h2/>
 
+      </div>
+
+      <div className='invite'>
+        <h2>Invite Collaborators</h2>
+        <input 
+          type="text" 
+          placeholder="exampleEmail@gmail.com"
+        />
+        <button className="submit" >Submit</button>
       </div>
 
       <div className="deleteButton">
