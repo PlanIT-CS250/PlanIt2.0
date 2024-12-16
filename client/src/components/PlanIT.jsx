@@ -28,8 +28,29 @@ function PlanIT() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
+  const [isMailboxOpen, setIsMailboxOpen] = useState(false);
+  const [invites, setInvites] = useState([]);
+  
+  
+  useEffect(() => {
+    const fetchInvites = async () => {
+      try {
+        const res = await axios.get(`http://localhost:3000/users/${userId}/invites`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        setInvites(res.data.invites);
+      } catch (error) {
+        console.error("Error fetching invites:", error);
+      }
+    };
+    if (userId) {
+      fetchInvites();
+    }
+  }, [userId, token]);
 
-  //Grab token from local storage
+//Grab token from local storage
 useEffect(() => {
     try {
         //If token not found, navigate to hub
@@ -280,7 +301,6 @@ async function deleteTask(taskId) {
     }
   }
 }
-
 // Update task
 async function updateTask(taskId, changes)
 {
@@ -389,6 +409,14 @@ const closeModal = () => {
   setSelectedCard(null);
 };
 
+const openMailbox = () => {
+  setIsMailboxOpen(true);
+}
+
+const closeMailbox = () => {
+  setIsMailboxOpen(false);
+}
+
 // Function to handle card updates
 // const handleCardUpdate = (updatedDetails) => {
 //   updateTask(selectedCard.id, updatedDetails);
@@ -411,6 +439,7 @@ const closeModal = () => {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="hub-nav-right">
+          <button className="mailbox-button" onClick={openMailbox}>Mailbox</button>
           <NavLink to={`/planets/${planetId}/settings/`} className="settings">
             <FaCog className="settings-icon" />
           </NavLink>
@@ -466,6 +495,28 @@ const closeModal = () => {
         deleteTask={deleteTask} // Pass deleteTask as a prop
         collaborators={planetCollaborators || []}
       />
+      <Modal
+        isOpen={isMailboxOpen}
+        onRequestClose={closeMailbox}
+        className="custom-modal-content"
+        overlayClassName="custom-modal-overlay"
+        >
+        <div className="mailbox">
+          <h2>Mailbox</h2>
+          <ul className="invite-list">
+            {invites.map((invite) => (
+              <li key={invite.id} className="invite-item">
+                <span>ID: {invite.id}</span>
+                <span>Sender: {invite.sender}</span>
+                <span>Planet Name: {invite.planetName}</span>
+                <button>Accept</button>
+                <button>Decline</button>
+              </li>
+            ))}
+          </ul>
+          <button onClick={closeMailbox}>Close</button>
+        </div>
+        </Modal>
     </div>
   );
 }
@@ -499,6 +550,7 @@ function Column({ id, name, items, createTask, editCardContent }) {
       <button className="add-card-button" onClick={() => createTask(id)}>
         + Add Card
       </button>
+      <button>Delete Column</button>
     </div>
   );
 }
