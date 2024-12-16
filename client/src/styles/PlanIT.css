@@ -2,11 +2,10 @@
     background-color: transparent;
     min-height: 100vh;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    padding: 20px;
+    padding-top: 450px;
   }
-  
 
   .planit-page .board {
     display: flex;
@@ -21,7 +20,7 @@
     max-height: 80vh;
     align-items: flex-start;    
     display: flex;
-    overflow: visible; /* Ensure overflow is visible */
+    overflow: visible;
   }
   
   .planit-page .column {
@@ -37,23 +36,19 @@
   
   .planit-page .column h3 {
     margin: 0;
-    padding: 8px;
+    padding: 12px;
     text-align: center;
     font-size: 18px;
     font-weight: 600;
     color: #ffffffdd;
     background-color: #3a444e;
-    border-radius: 4px;
+    border-radius: 4px 4px 0 0;
   }
   
   .planit-page .cards-container {
     flex-grow: 1;
     overflow-y: auto;
-    padding: 8px 0;
-    max-height: 400px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    padding: 10px;
   }
   
   /* Card styling */
@@ -302,14 +297,14 @@
   .custom-modal-content .description-label {
     font-weight: bold;
     margin-bottom: 5px;
-    padding-bottom: 200px;
+    padding-bottom: 275px;
     padding-left: 30px;
   }
 
   .custom-modal-content .priority-label {
     font-weight: bold;
     margin-bottom: 5px;
-    padding-top: 125px;
+    padding-top: 50px;
     padding-left: 30px;
   }
 
@@ -358,4 +353,63 @@
   
   .custom-modal-content .cancel-button:hover {
     background-color: #5a6268;
+  }
+
+  .delete-button {
+    background-color: #ff4d4d; /* Red background */
+    color: white; /* White text */
+    border: none; /* No border */
+    padding: 10px 20px; /* Padding */
+    font-size: 16px; /* Font size */
+    cursor: pointer; /* Pointer cursor on hover */
+    border-radius: 5px; /* Rounded corners */
+    transition: background-color 0.3s ease; /* Smooth transition */
+  }
+  
+  .delete-button:hover {
+    background-color: #ff1a1a; /* Darker red on hover */
+  }
+
+  .assigned-user-label {
+    display: block;
+    margin-top: 10px;
+    padding-left: 30px;
+    padding-top: 125px;
+    font-weight: bold;
+  }
+  
+  .assigned-user-select {
+    width: 100%;
+    padding: 8px;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+  }
+
+  .custom-modal-content .modal-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .custom-modal-content .buttons {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .custom-modal-content .timestamps {
+    text-align: right;
+  }
+  
+  .custom-modal-content .timestamps p {
+    margin: 0;
+    font-size: 12px;
+    color: #888;
+  }
+
+  .planit-page .empty-column {
+    color: black;
+    text-align: center;
   }
