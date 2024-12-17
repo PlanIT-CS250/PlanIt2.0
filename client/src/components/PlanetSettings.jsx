@@ -9,9 +9,20 @@ function PlanetSettings() {
     const [token, setToken] = useState();
     const [userId, setUserId] = useState();
     const [user, setUser] = useState();
+    const [email, setEmail] = useState();
+    const [name, setName] = useState();
+    const [description, setDescription] = useState();
     const [planet, setPlanet] = useState({ name: '', description: ''});
     const [planetCollaborators, setPlanetCollaborators] = useState([]);
     const navigate = useNavigate();
+
+    const handleNameChange = (e) => {
+      setName(e.target.value);
+    }
+
+    const handleDescriptionChange = (e) => {
+      setDescription(e.target.value);
+    }
 
     //Grab token from local storage
     useEffect(() => {
@@ -109,8 +120,90 @@ useEffect(() => {
   }
 }, [user]);
 
+async function sendInvite(userEmail)
+{
+  try
+  {
+      console.log('Sending invite', userEmail);
+      const res = await axios.post(`http://localhost:3000/planets/${planetId}/invite`, { userEmail },
+      {
+      headers: {
+          'Authorization': `Bearer ${token}`
+      }
+      }
+      );
+  }
+  catch(error)
+  {
+      console.log(error);
+  }
+}
 
+const handleEmailChange = (e) => {
+  setEmail(e.target.value);
+}
 
+function submitInvite() {
+  sendInvite(email);
+}
+
+async function kickUser(userId)
+{
+  try
+  {
+      console.log('Kicking user', userId);
+      const res = await axios.delete(`http://localhost:3000/planets/${planetId}/users/${userId}`,
+      {
+      headers: {
+          'Authorization': `Bearer ${token}`
+      }
+      }
+      );
+  }
+  catch(error)
+  {
+      console.log(error);
+  }
+}
+
+async function updatePlanet(name, description)
+{
+  try
+  {
+      console.log('Updating planet', name, description);
+      const res = await axios.put(`http://localhost:3000/planets/${planetId}`, {name, description},
+      {
+      headers: {
+          'Authorization': `Bearer ${token}`
+      }
+      }
+      );
+      console.log(res);
+  }
+  catch(error)
+  {
+      console.log(error);
+  }
+}
+
+async function promoteUser(userId)
+{
+  try
+  {
+      console.log('Promoting user', userId);
+      const res = await axios.put(`http://localhost:3000/planets/${planetId}/users/${userId}/promote`,
+      {
+      headers: {
+          'Authorization': `Bearer ${token}`
+      }
+      }
+      );
+  }
+  catch(error)
+  {
+      console.log(error);
+  }
+}
 
 return (
   <div className="pSettingsContainer">
@@ -122,13 +215,17 @@ return (
         <input 
           type="text" 
           placeholder="Planet Name"
+          onChange={handleNameChange}
+          value={name}
         />
         <h2>{planet.description}</h2>
         <input 
           type="text" 
           placeholder="Planet Description"
+          onChange={handleDescriptionChange}
+          value={description}
         />
-        <button className="submit" >Submit</button>
+        <button onClick={() => updatePlanet(name, description)} className="submit" >Submit</button>
       </div>
 
       <div className="collaborators">
@@ -140,8 +237,8 @@ return (
             .map(collaborator => (
               <li key={collaborator._id}>
                 {collaborator.username}
-                <button className="promoteButton">Promote</button>
-                <button className="kickButton">Kick</button>
+                <button onClick={() => promoteUser(collaborator._id)} className="promoteButton">Promote</button>
+                <button onClick={() => kickUser(collaborator._id)} className="kickButton">Kick</button>
               </li>
             ))}
         </ul>
@@ -194,8 +291,9 @@ return (
         <input 
           type="text" 
           placeholder="exampleEmail@gmail.com"
+          onChange={handleEmailChange}
         />
-        <button className="submit" >Submit</button>
+        <button onClick={submitInvite} className="submit" >Submit</button>
       </div>
 
       <div className="deleteButton">

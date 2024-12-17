@@ -533,8 +533,6 @@ async function updateTask(req, res)
                         }
                         if (filteredFields.includes("assignedUserId"))
                         {
-                            console.log(req.body.assignedUserId);
-                            console.log(req.body.assignedUserId);
                             if (req.body.assignedUserId == null) {
                                 task.assignedUserId = null;
                             }
@@ -682,10 +680,10 @@ async function updatePlanet(req, res)
     try
     {
         const { planetId } = req.params;
-        const { name, description, theme, color } = req.body;
+        const { name, description } = req.body;
 
         //Find planet
-        const planet = Planet.findById(planetId);
+        const planet = await Planet.findById(planetId);
         const originalPlanet = planet; //Copy of planet to prevent potential data loss
         if (planet)
         {
@@ -708,7 +706,6 @@ async function updatePlanet(req, res)
                 } catch (error) 
                 {
                     console.error(error.message);
-                    await originalPlanet.save(); //Resave original document
 
                     //Mongoose schema validation error
                     if (error instanceof mongoose.Error.ValidationError) 
@@ -739,7 +736,7 @@ async function updatePlanet(req, res)
         });
     } 
     catch(error) {
-        console.error(error);
+        console.log(error);
         res.status(500).json({ 
             message: "Server error. Contact support or try again later." 
         });
