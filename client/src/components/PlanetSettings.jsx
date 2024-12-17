@@ -252,30 +252,16 @@ return (
         <h2></h2>
         <h2>
           Color:  {planet.color}
-          {/* preview of the color and an input to change the color, styled so they are ontop of each other */}
-          <div 
-        className="preview"
-        style={{
-          display: 'inline-block',
-          width: '20px',
-          height: '20px',
-          backgroundColor: planet.color,
-          marginLeft: '10px',
-          position: 'relative',
-          top: '3px',
-          border: '1px solid #000'
-        }}
-      />
       <input
         type="color"
         value={planet.color}
         style={{
           display: 'inline-block',
-          width: '20px',
-          height: '20px',
-          marginLeft: '-21px',
+          width: '30px',
+          height: '40px',
+          marginLeft: '0px',
           position: 'relative',
-          bottom: '7px',
+          bottom: '-3px',
           background: 'none'
         }}
       />
@@ -284,6 +270,10 @@ return (
 
         <h2/>
 
+      </div>
+
+      <div className='line'>
+        <hr/>
       </div>
 
       <div className='invite'>

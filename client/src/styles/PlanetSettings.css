@@ -20,7 +20,7 @@
 }
 
 .deleteButton {
-    margin-top: auto;
+    margin-top: 125px;
     text-align: right;
 }
 
@@ -63,4 +63,19 @@
 .kickButton {
     margin-left: 20px;
     font-size: 15px;   
+}
+
+.invite {
+    margin-top: -200px; /* Adjust margin to position invite correctly */
+}
+
+.line {
+    margin: 200px 0;
+}
+
+.line hr {
+    border: 0;
+    height: 1px;
+    background: #333;
+    background-image: linear-gradient(to right, #ccc, #333, #ccc);
 }

@@ -432,6 +432,8 @@ const closeModal = () => {
 };
 
 
+
+
   // The PlanIT page
   return (
     <div className="planit-page">
@@ -507,6 +509,8 @@ const closeModal = () => {
     </div>
   );
 }
+
+
 
 // Column component
 function Column({ id, name, items, createTask, editCardContent, deleteColumn }) {

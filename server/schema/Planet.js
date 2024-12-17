@@ -31,7 +31,7 @@ const planetSchema = new mongoose.Schema({
   theme: {
     type: [String],
     required: false,
-    default: ["#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF", "#FFFFFF"],
+    default: ["#FF0000", "#FF0000", "#FF0000", "#FF0000", "#FF0000"],
     validate: [
       {
         validator: v => {

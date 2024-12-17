@@ -49,10 +49,10 @@ class UploadImage extends React.Component {
             position: { x: 0.5, y: 0.5 },
             scale: 1,
             rotate: 0,
-            borderRadius: 50,
+            borderRadius: 25,
             preview: null,
-            width: 300,
-            height: 300
+            width: 125,
+            height: 150 
         };
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -286,7 +286,7 @@ function UserSettings() {
                 <input onChange={handleUserNameChange} placeholder="Enter new username" />
                 <h2>Change Password</h2>
                 <input onChange={handlePasswordChange} type="text" placeholder="Enter new password" />
-                <button onClick={() => updateUser(userId, { username, password })}>Submit</button>
+                <button className='Submit' onClick={() => updateUser(userId, { username, password })}>Submit</button>
             </div>
             <div>
             <UploadImage setPfpLink={handlePfpLinkUpdate} />

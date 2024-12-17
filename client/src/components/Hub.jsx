@@ -14,6 +14,13 @@ import { SketchPicker } from 'react-color';
 import { Dropbox } from 'dropbox';
 
 function Hub() {
+    const themes = {
+        'Theme 1': ['#3e204f', '#5a4565', '#cec9d6', '#e2dbe9', '#bcaecc'],
+        'Theme 2': ['#ffa2a2', '#9f917b', '#c5b88f', '#f9f0f0', '#aaaaaa'],
+        'Theme 3': ['#424853', '#ff7b7b', '#cccccc', '#bbbbbb', '#aaaaaa'],
+        'None': []
+    };
+
     const [cards, setCards] = useState([]);
     const [openModal, setOpenModal] = useState(false)
     const [isDropdownOpen, setDropdownOpen] = useState(false);
@@ -27,7 +34,7 @@ function Hub() {
     const maxCards = 15; // Set the maximum number of cards
     const navigate = useNavigate();
     const [wcolor, setWcolor] = useState('#FFFFFF');
-    const [theme, setTheme] = useState();
+    const [theme, setTheme] = useState(themes['Theme 1']);
     const onClose = () => setOpenModal(false);
     const [pfp, setPfp] = useState('/');
     const dbx = new Dropbox({
@@ -498,14 +505,8 @@ function Hub() {
         const handleToggle = (isOpen) => {
           setShowMenu(isOpen);
         };
+        
 
-        const themes = {
-            'Theme 1': ['#3e204f', '#5a4565', '#cec9d6', '#e2dbe9', '#bcaecc'],
-            'Theme 2': ['#ffa2a2', '#9f917b', '#c5b88f', '#f9f0f0', '#aaaaaa'],
-            'Theme 3': ['#424853', '#ff7b7b', '#cccccc', '#bbbbbb', '#aaaaaa'],
-            'None': []
-        };
-      
         return (
           <Dropdown className="dropdown" show={showMenu} onToggle={handleToggle}>
             <Dropdown.Toggle variant="success" id="dropdown-basic">
@@ -516,7 +517,7 @@ function Hub() {
               <Dropdown.Item onClick={() => setTheme(themes['Theme 1'])}>Theme 1</Dropdown.Item>
               <Dropdown.Item onClick={() => setTheme(themes['Theme 2'])}>Theme 2</Dropdown.Item>
               <Dropdown.Item onClick={() => setTheme(themes['Theme 3'])}>Theme 3</Dropdown.Item>
-              <Dropdown.Item onClick={() => setTheme('Null')}>None</Dropdown.Item>
+              {/*<Dropdown.Item onClick={() => setTheme(themes['None'])}>None</Dropdown.Item> come back to this sh*t later*/}
             </Dropdown.Menu>
           </Dropdown>
         );
