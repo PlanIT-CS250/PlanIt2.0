@@ -420,3 +420,70 @@
     overflow: hidden; /* Hide overflow */
 
 }
+
+.mailbox {
+    text-align: center;
+  }
+  
+  .mailbox h2 {
+    margin-bottom: 20px;
+    color: black;
+  }
+  
+  .mailbox p {
+    margin-bottom: 20px;
+  }
+  
+  .mailbox button {
+    background-color: #4e5a65;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+  }
+  
+  .mailbox button:hover {
+    background-color: #3a444e;
+  }
+
+  .invite-list {
+  list-style-type: none;
+  padding: 0;
+}
+
+.invite-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  
+}
+
+.invite-item span {
+  flex: 1;
+  text-align: left;
+  color: black;
+}
+
+.invite-item button {
+  background-color: #4e5a65;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  margin-left: 10px;
+}
+
+.invite-item button:hover {
+  background-color: #3a444e;
+}
+
+.mailbox-icon{
+    padding-right: 25px;
+}
+
+

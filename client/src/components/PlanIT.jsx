@@ -28,11 +28,10 @@ function PlanIT() {
   const navigate = useNavigate();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCard, setSelectedCard] = useState(null);
-  const [isMailboxOpen, setIsMailboxOpen] = useState(false);
   const [invites, setInvites] = useState([]);
   
   
-  useEffect(() => {
+useEffect(() => {
     const fetchInvites = async () => {
       try {
         const res = await axios.get(`http://localhost:3000/users/${userId}/invites`, {
@@ -48,7 +47,7 @@ function PlanIT() {
     if (userId) {
       fetchInvites();
     }
-  }, [userId, token]);
+}, [userId, token]);
 
 //Grab token from local storage
 useEffect(() => {
@@ -277,6 +276,29 @@ async function createTask(columnId, content)
   } 
 }
 
+
+
+// Delete column
+const deleteColumn = async (columnId) => {
+  try {
+    await axios.delete(`http://localhost:3000/planets/columns/${columnId}`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    });
+    fetchColumns();
+  } catch (error) {
+    if (error.response) {
+      alert(error.response.data.message);
+      console.error(error.response.data);
+    } else if (error.request) {
+      alert("Internal server error. Contact support or try again later.");
+      console.error(error.request);
+    } else {
+      alert("There was an error deleting the column. Please try again later.");
+      console.error(error.message);
+    }
+  }
+};
+
 // Delete task
 async function deleteTask(taskId) {
   try {
@@ -397,7 +419,7 @@ const handleDragEnd = (event) => {
   updateTask(active.id, { order: destinationTasks.indexOf(movedTask) + 1, columnId: destinationColumn.id });
 };
 
-  // Function to open the modal
+// Function to open the modal
 const openModal = (card) => {
   setSelectedCard(card);
   setIsModalOpen(true);
@@ -409,19 +431,6 @@ const closeModal = () => {
   setSelectedCard(null);
 };
 
-const openMailbox = () => {
-  setIsMailboxOpen(true);
-}
-
-const closeMailbox = () => {
-  setIsMailboxOpen(false);
-}
-
-// Function to handle card updates
-// const handleCardUpdate = (updatedDetails) => {
-//   updateTask(selectedCard.id, updatedDetails);
-//   closeModal();
-// };
 
   // The PlanIT page
   return (
@@ -439,7 +448,6 @@ const closeMailbox = () => {
           <input type="text" placeholder="Search..." />
         </div>
         <div className="hub-nav-right">
-          <button className="mailbox-button" onClick={openMailbox}>Mailbox</button>
           <NavLink to={`/planets/${planetId}/settings/`} className="settings">
             <FaCog className="settings-icon" />
           </NavLink>
@@ -475,6 +483,7 @@ const closeMailbox = () => {
               name={column.name}
               items={column.tasks}
               createTask={createTask}
+              deleteColumn={() => deleteColumn(column.id)}
               editCardContent={(id, taskId) => openModal({
                  id: taskId, content: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).content,
                  id: taskId, description: columns.find(col => col.id === id).tasks.find(task => task.id === taskId).description,
@@ -495,34 +504,12 @@ const closeMailbox = () => {
         deleteTask={deleteTask} // Pass deleteTask as a prop
         collaborators={planetCollaborators || []}
       />
-      <Modal
-        isOpen={isMailboxOpen}
-        onRequestClose={closeMailbox}
-        className="custom-modal-content"
-        overlayClassName="custom-modal-overlay"
-        >
-        <div className="mailbox">
-          <h2>Mailbox</h2>
-          <ul className="invite-list">
-            {invites.map((invite) => (
-              <li key={invite.id} className="invite-item">
-                <span>ID: {invite.id}</span>
-                <span>Sender: {invite.sender}</span>
-                <span>Planet Name: {invite.planetName}</span>
-                <button>Accept</button>
-                <button>Decline</button>
-              </li>
-            ))}
-          </ul>
-          <button onClick={closeMailbox}>Close</button>
-        </div>
-        </Modal>
     </div>
   );
 }
 
 // Column component
-function Column({ id, name, items, createTask, editCardContent }) {
+function Column({ id, name, items, createTask, editCardContent, deleteColumn }) {
   const { setNodeRef } = useDroppable({ id });
   return (
     <div ref={setNodeRef} className="column">
@@ -550,7 +537,7 @@ function Column({ id, name, items, createTask, editCardContent }) {
       <button className="add-card-button" onClick={() => createTask(id)}>
         + Add Card
       </button>
-      <button>Delete Column</button>
+      <button onClick={deleteColumn}>Delete Column</button>
     </div>
   );
 }

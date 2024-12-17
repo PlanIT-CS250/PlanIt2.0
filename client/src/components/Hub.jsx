@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import '../styles/Hub.css';
 import profileImage from '../assets/profile.png';
 import logoImage from '../assets/logo.png';
-import { FaCog } from 'react-icons/fa'; // Import the gear icon
+import { FaCog, FaEnvelope } from 'react-icons/fa'; // Import the gear icon
 import { jwtDecode } from 'jwt-decode'; //To decode userId from token
 import axios from 'axios';
 import '../styles/Dropdown.css';
@@ -34,6 +34,62 @@ function Hub() {
         accessToken: "sl.CCci3gXmyVZumwbS0DBdl9Wc5a95VSz3oSwLzRll2jQJhrMJve1_M56EQwDxZoBLmHsrG4Un68EDecWtb9zCs5-pO7yYq4zx6s7aeOjUOzpzY87O0Qj5mIs3uBiF6iKws6RX4Exohuqc",
         fetch: fetch.bind(window)
     });
+    const [isInviteModalOpen, setInviteModalOpen] = useState(false); // State for invite modal
+    const [invites, setInvites] = useState([]); // State for invites
+
+    const handleInviteModalOpen = () => {
+        setInviteModalOpen(true);
+    };
+
+    const handleInviteModalClose = () => {
+        setInviteModalOpen(false);
+    };
+
+    const InviteModal = ({ open, onClose, invites }) => {
+        if (!open) return null;
+        return (
+            <div onClick={onClose} className='custom-modal-overlay'>
+                <div onClick={(e) => e.stopPropagation()} className='custom-modal-content'>
+                    <div className="modalRight">
+                        <p onClick={onClose} className="closeBtn">X</p>
+                        <div className="mailbox">
+                            <h2>Mailbox</h2>
+                            <ul className="invite-list">
+                                {invites.map((invite) => (
+                                    <li key={invite._id} className="invite-item">
+                                        <span>Sender: {invite.invitingUserEmail}</span>
+                                        <span>Planet Name: {invite.planetName}</span>
+                                        <button onClick={() => handleAcceptInvite(invite._id)}>Accept</button>
+                                        <button onClick={() => handleDeclineInvite(invite._id)}>Decline</button>
+                                    </li>
+                                ))}
+                            </ul>
+                            <button onClick={onClose}>Close</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    };
+
+
+    useEffect(() => {
+        const fetchInvites = async () => {
+            try {
+                const res = await axios.get(`http://localhost:3000/users/${userId}/invites`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+                setInvites(res.data.invites);
+            } catch (error) {
+                console.error("Error fetching invites:", error);
+            }
+        };
+        if (userId) {
+            fetchInvites();
+        }
+    }, [userId, token]);
 
     //Grab token from local storage
     useEffect(() => {
@@ -193,7 +249,6 @@ function Hub() {
         }
     }, [user]);
 
-
     //Post new planet information to database
     async function createPlanet()
     {
@@ -269,6 +324,39 @@ function Hub() {
             setNewCardDesc("Enter Description");
         }
     }
+
+    //Accept Invite
+
+    const handleAcceptInvite = async (inviteId) => {
+        try {
+            await axios.post(`http://localhost:3000/invites/${inviteId}/accept`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setInvites(prevInvites => prevInvites.filter(invite => invite._id !== inviteId));
+            alert("Invite accepted successfully!");
+        } catch (error) {
+            console.error("Error accepting invite:", error);
+            alert("There was an error accepting the invite. Please try again later.");
+        }
+    };
+
+    const handleDeclineInvite = async (inviteId) => {
+        try {
+            await axios.post(`http://localhost:3000/invites/${inviteId}/decline`, {}, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            setInvites(prevInvites => prevInvites.filter(invite => invite._id !== inviteId));
+            alert("Invite declined successfully!");
+        } catch (error) {
+            console.error("Error declining invite:", error);
+            alert("There was an error declining the invite. Please try again later.");
+        }
+    };
+
 
     //Adds a card of given planet to list
     const addCard = (planet) => {
@@ -404,7 +492,7 @@ function Hub() {
     }
       
 
-      function ThemeDrop() {
+    function ThemeDrop() {
         const [showMenu, setShowMenu] = useState(false);
       
         const handleToggle = (isOpen) => {
@@ -432,7 +520,7 @@ function Hub() {
             </Dropdown.Menu>
           </Dropdown>
         );
-      }
+    }
 
     return (
         <div className="hub-container">
@@ -447,10 +535,10 @@ function Hub() {
                     <input type="text" placeholder="Search..." />
                 </div>
                 <div className="hub-nav-right">
+                    <FaEnvelope className="mailbox-icon" onClick={handleInviteModalOpen} />
                     <NavLink to="/settings" className="settings">
                         <FaCog className="settings-icon" />
-                    </NavLink>
-                    <div className="profile" onClick={toggleDropdown}>
+                    </NavLink>                    <div className="profile" onClick={toggleDropdown}>
                         <img src={pfp} alt="Profile" className="profile-image" />
                         {isDropdownOpen && (
                             <div className="profile-dropdown">
@@ -471,6 +559,8 @@ function Hub() {
                     </div>
                 </div>
             </div>
+
+            <InviteModal open={isInviteModalOpen} onClose={handleInviteModalClose} invites={invites} />
 
             <div className="card-container">
                     {cards.map(card => (
